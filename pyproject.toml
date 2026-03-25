@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "studio-pipe"
+version = "0.1.0"
+description = "A generic production-ready CG Studio Pipeline core"
+authors = ["Kamal <kamal@example.com>"]
+readme = "README.md"
+packages = [{include = "studio_pipe"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = {extras = ["all"], version = "^0.15.1"}
+pyyaml = "^6.0.1"
+gazu = "^0.8.21"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+
+[tool.poetry.scripts]
+studio-pipe = "studio_pipe.__main__:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

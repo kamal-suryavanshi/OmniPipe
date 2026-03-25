@@ -1,0 +1,22 @@
+# Studio Pipeline Configuration
+
+# The root directory where all project data is stored on network or disk.
+# Allows using env variables like {STUDIO_ROOT}
+project_root: "{STUDIO_ROOT}/{project}"
+
+templates:
+  # Sequences and Shots
+  sequence_root: "{project_root}/sequences/{sequence}"
+  shot_root: "{sequence_root}/{shot}"
+  
+  # Assets
+  asset_root: "{project_root}/assets/{asset_type}/{asset}"
+  
+  # Workfiles
+  work_file_maya: "{shot_root}/work/maya/{task}/{project}_{shot}_{task}_v{version}.ma"
+  work_file_nuke: "{shot_root}/work/nuke/{task}/{project}_{shot}_{task}_v{version}.nk"
+  
+  # Publishes
+  publish_dir: "{shot_root}/publish/{dcc}/{task}/v{version}"
+  publish_file_maya: "{publish_dir}/{project}_{shot}_{task}_v{version}.ma"
+  publish_file_nuke: "{publish_dir}/{project}_{shot}_{task}_v{version}.nk"
