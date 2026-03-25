@@ -17,31 +17,36 @@ def init():
     typer.echo("Initializing OmniPipe...")
 
 @app.command()
+def login():
+    """
+    Authenticate with the central Asset Management System (Kitsu).
+    """
+    from omnipipe.core.pipeline import PipelineAPI
+    api = PipelineAPI()
+    typer.echo("Attempting to connect to Kitsu via API...")
+    if api.login():
+        typer.echo("Success! Connected to Asset Manager.")
+    else:
+        typer.echo("Failed to connect. Please check your .env credentials or ensure the server is running.")
+
+@app.command()
 def context(project: str, sequence: str = "seq01", shot: str = "sh010", task: str = "anim", version: str = "001", dcc: str = "maya"):
     """
     Test resolving the pipeline context paths against your schema.yaml
     """
-    from omnipipe.core.context import PipelineContext, PathResolver
+    from omnipipe.core.pipeline import PipelineAPI
     
-    ctx = PipelineContext(
-        project=project,
-        sequence=sequence,
-        shot=shot,
-        task=task,
-        version=version,
-        dcc=dcc
-    )
-    
-    resolver = PathResolver()
+    api = PipelineAPI()
+    ctx = api.build_context(project, sequence, shot, task, version, dcc)
     
     typer.echo(f"Resolving paths for Project: [ {project} ]")
     typer.echo("-" * 40)
     
     try:
-        work_path = resolver.resolve(f"work_file_{dcc}", ctx)
+        work_path = api.resolver.resolve(f"work_file_{dcc}", ctx)
         typer.echo(f"Work File: {work_path}")
         
-        pub_path = resolver.resolve(f"publish_file_{dcc}", ctx)
+        pub_path = api.resolver.resolve(f"publish_file_{dcc}", ctx)
         typer.echo(f"Publish File: {pub_path}")
     except Exception as e:
         typer.echo(f"Error resolving paths: {e}")

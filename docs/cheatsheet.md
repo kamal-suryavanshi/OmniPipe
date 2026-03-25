@@ -14,14 +14,21 @@ poetry run omnipipe [COMMAND] [OPTIONS]
 poetry run omnipipe init
 ```
 - **Who:** Pipeline TDs / Leads / Users
-- **Description:** Initializes the pipeline environment on a new machine or for a new artist. Ensures all base configurations are loaded.
+- **Description:** Initializes the pipeline environment on a new machine.
 
-### 2. `context`
+### 2. `login`
+```bash
+poetry run omnipipe login
+```
+- **Who:** Any Developer or Artist
+- **Description:** Verifies pipeline connection against the central Asset Management DB (Kitsu). Reads credentials automatically from the root `.env` config file!
+
+### 3. `context`
 ```bash
 poetry run omnipipe context [project_name] --sequence seq01 --shot sh010 --task anim --dcc maya
 ```
 - **Who:** Developers & TDs
-- **Description:** Dry-runs the Context System Path Resolver. It reads the local `configs/schema.yaml` and simulates exactly where Maya or Nuke workfiles and publishes will physically map on your machine or network. Use this when debugging new folder schemas.
+- **Description:** Dry-runs the Context System Path Resolver. It reads `configs/schema.yaml` and simulates exactly where Maya or Nuke files will physically save.
 
 ---
-_Note: More features (Publishing, Workfile Manager) will be added here as Day 3+ progresses!_
+_Note: More features (Publishing, Workfile Manager) will be added here as Day 4+ progresses!_
