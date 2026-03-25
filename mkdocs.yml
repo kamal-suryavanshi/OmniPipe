@@ -1,0 +1,9 @@
+site_name: OmniPipe Documentation
+site_description: A dynamic CG Studio Pipeline
+theme: readthedocs
+
+nav:
+  - Home: index.md
+  - CLI Cheatsheet (Usage): cheatsheet.md
+  - Architecture Walkthroughs:
+    - Day 1 and 2: walkthroughs/day_1_and_2.md
