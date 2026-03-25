@@ -42,9 +42,16 @@ def context(project: str, sequence: str = "seq01", shot: str = "sh010", task: st
     """
     Test resolving the pipeline context paths against your schema.yaml
     """
+    import os
     from omnipipe.core.pipeline import PipelineAPI
     
     api = PipelineAPI()
+    
+    # Smart OS Environment Warning for Windows users
+    if sys.platform == "win32" and "STUDIO_ROOT" not in os.environ:
+        typer.secho("\n[WARNING] You are running on Windows, but STUDIO_ROOT is missing from your .env file.", fg=typer.colors.YELLOW)
+        typer.secho("The pipeline is temporarily falling back to a Linux path (/tmp/studio/).", fg=typer.colors.YELLOW)
+        typer.secho("Please create an .env file and set a valid Windows drive (e.g., STUDIO_ROOT=Z:/Pipeline)\n", fg=typer.colors.YELLOW)
     ctx = api.build_context(project, sequence, shot, task, version, dcc)
     
     typer.echo(f"Resolving paths for Project: [ {project} ]")
