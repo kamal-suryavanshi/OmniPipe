@@ -1,11 +1,11 @@
 import typer
 
-app = typer.Typer(help="Studio Pipeline Core CLI")
+app = typer.Typer(help="OmniPipe Core CLI")
 
 @app.callback()
 def callback():
     """
-    Studio Pipeline - A unified CLI for CG/VFX Workflows.
+    OmniPipe - A unified CLI for CG/VFX Workflows.
     """
     pass
 
@@ -14,7 +14,7 @@ def init():
     """
     Initialize the pipeline environment for a user or team.
     """
-    typer.echo("Initializing Studio Pipeline...")
+    typer.echo("Initializing OmniPipe...")
 
 @app.command()
 def context():

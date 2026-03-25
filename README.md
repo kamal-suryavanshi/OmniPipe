@@ -1,4 +1,4 @@
-# Studio Pipeline Core
+# OmniPipe Core
 
 A generic, production-ready CG Studio Pipeline core designed for distributed teams.
 
@@ -12,5 +12,5 @@ A generic, production-ready CG Studio Pipeline core designed for distributed tea
 
 ```bash
 poetry install
-poetry run studio-pipe --help
+poetry run omnipipe --help
 ```
