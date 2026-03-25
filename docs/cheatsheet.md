@@ -4,7 +4,7 @@ The OmniPipe CLI is built on **Typer**, making it inherently self-documenting. T
 
 ## Base Structure
 ```bash
-poetry run omnipipe [COMMAND] [OPTIONS]
+python -m omnipipe [COMMAND] [OPTIONS]
 ```
 
 ## Available Commands
@@ -14,7 +14,7 @@ poetry run omnipipe [COMMAND] [OPTIONS]
 - **Description:** Initializes the pipeline environment on a new machine. Ensures all base configurations are loaded.
 - **Valid Example:**
   ```bash
-  poetry run omnipipe init
+  python -m omnipipe init
   ```
   *(Expected Output: "Initializing OmniPipe...")*
 
@@ -23,7 +23,7 @@ poetry run omnipipe [COMMAND] [OPTIONS]
 - **Description:** Verifies pipeline connection against the central Asset Management DB (Kitsu). Reads credentials automatically from the root `.env` config file!
 - **Valid Example:**
   ```bash
-  poetry run omnipipe login
+  python -m omnipipe login
   ```
   *(Expected Output: "Success! Connected to Asset Manager.")*
 
@@ -33,7 +33,7 @@ poetry run omnipipe [COMMAND] [OPTIONS]
 - **Valid Example:**
   ```bash
   # Test the path resolver for sequence 'seq01', shot 'sh010', task 'anim' in Maya
-  poetry run omnipipe context my_test_project --sequence seq01 --shot sh010 --task anim --dcc maya
+  python -m omnipipe context my_test_project --sequence seq01 --shot sh010 --task anim --dcc maya
   ```
   *(Expected Output: Resolves and prints exact physical paths for the Work File and Publish File)*
 

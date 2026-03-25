@@ -1,0 +1,2 @@
+[console_scripts]
+gazu-cli = gazu.cli:main [cli]

@@ -6,14 +6,18 @@ It uses a fully decoupled architecture powered by Python and a custom Context Sy
 
 ## Quick Start for Developers (Person B & C)
 
-1. Ensure you have [Poetry](https://python-poetry.org/) installed.
-2. Clone the repository and run:
+OmniPipe uses a **Vendorized Architecture**. This means 100% of the dependencies (like the CLI framework and Kitsu API) are pre-packaged in the `omnipipe/vendor/` folder. 
+
+There are zero installations required.
+
+1. Clone the repository:
    ```bash
-   poetry install
+   git clone https://github.com/kamal-suryavanshi/OmniPipe.git
+   cd OmniPipe
    ```
-3. Test the setup by running the CLI help:
+2. Test the setup instantly using standard Python:
    ```bash
-   poetry run omnipipe --help
+   python -m omnipipe --help
    ```
 
 To explore the pipeline further, check out the **[CLI Cheatsheet](cheatsheet.md)**.

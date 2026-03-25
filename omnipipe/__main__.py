@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+# Inject local vendor dependencies for zero-install workflows
+VENDOR_DIR = Path(__file__).parent / "vendor"
+if VENDOR_DIR.exists():
+    sys.path.insert(0, str(VENDOR_DIR.absolute()))
+
 import typer
 
 app = typer.Typer(help="OmniPipe Core CLI")
