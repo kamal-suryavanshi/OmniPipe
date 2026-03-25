@@ -1,0 +1,10 @@
+# OmniPipe Core Vendorized Dependencies
+# Note: Artists do NOT need to run this file. 
+# This is solely for Pipeline Developers to rebuild the vendor/ folder if needed.
+
+typer>=0.15.1
+pyyaml>=6.0.1
+gazu>=0.8.21
+
+# Cross-platform hidden dependencies (Explicitly tracked for Windows Click/Typer)
+colorama>=0.4.6
