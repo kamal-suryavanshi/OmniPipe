@@ -66,5 +66,31 @@ def context(project: str, sequence: str = "seq01", shot: str = "sh010", task: st
     except Exception as e:
         typer.echo(f"Error resolving paths: {e}")
 
+@app.command("test-dcc")
+def test_dcc(dcc: str = typer.Argument("maya", help="The DCC software to test (e.g., maya, nuke)")):
+    """
+    Ping the Headless Integrations (Maya/Nuke) without needing to open the software!
+    """
+    from omnipipe.dcc import get_dcc
+    
+    loader = get_dcc(dcc)
+    if not loader:
+        typer.secho(f"Error: DCC '{dcc}' is not implemented.", fg=typer.colors.RED)
+        raise typer.Exit(1)
+        
+    typer.secho(f"\n--- Pinging {dcc.upper()} Headless Integration ---", fg=typer.colors.CYAN)
+    typer.echo(f"1. Current File Status: {loader.get_current_file()}")
+    
+    test_path_work = f"/tmp/studio/TEST_PROJ/work/{dcc.lower()}/test_scene_v01.ext"
+    test_path_pub = f"/tmp/studio/TEST_PROJ/publish/{dcc.lower()}/test_scene_v01.ext"
+    
+    typer.echo(f"\n2. Simulating Save Hook...")
+    loader.save_as(test_path_work)
+    
+    typer.echo(f"\n3. Simulating Publish Hook...")
+    loader.publish(test_path_pub)
+    
+    typer.secho(f"\n--- {dcc.upper()} Testing Complete ---\n", fg=typer.colors.GREEN)
+
 if __name__ == "__main__":
     app()
