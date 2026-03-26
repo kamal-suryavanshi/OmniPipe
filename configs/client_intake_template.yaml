@@ -1,0 +1,114 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# OmniPipe Client Intake Form
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Instructions
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Fill in every field below. Remove the examples and put your own values.
+# 2. Remove any DCCs, departments, or asset types your studio does NOT use.
+# 3. Return this file to your Pipeline TD at least 48 hours before setup day.
+# 4. Do NOT rename this file — it will be read directly by init_studio.py.
+#
+# Accepted values for each field are noted inline with # comments.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── 1. Studio Identity ───────────────────────────────────────────────────────
+studio:
+  name:         "Acme VFX Studio"       # Full legal studio name (used in license key)
+  project_code: "ACME_PROJ_2026"        # Short UPPERCASE_UNDERSCORE project identifier
+  timezone:     "Asia/Kolkata"          # IANA tz name e.g. America/Los_Angeles, Europe/London
+
+# ── 2. File System ───────────────────────────────────────────────────────────
+filesystem:
+  # Absolute path to the root where ALL project data will live.
+  #   Windows NAS  : \\NAS01\projects  or  Z:\projects
+  #   Linux/Mac NAS: /mnt/nas/projects  or  /Volumes/StudioNAS
+  studio_root: "/mnt/nas/projects"
+  os_platform: "linux"                  # windows | linux | mac
+
+# ── 3. Project Structure ─────────────────────────────────────────────────────
+project_structure:
+  sequences:
+    count: 10                           # Total number of sequences in this project
+    naming: "sq{:03d}"                  # sq001, sq002 … | ep{:02d} for episodic | seq_{:03d}
+  shots:
+    per_sequence: 20                    # Shots to pre-create under each sequence
+    naming: "sh{:03d}0"                 # sh0010, sh0020 … (increment of 10)
+    # Alternatives:
+    #   "sh{:04d}"  → sh0001, sh0002 (increment of 1)
+    #   "{:04d}"    → 0001, 0002 (bare numbers)
+
+# ── 4. Departments / Tasks ───────────────────────────────────────────────────
+departments:
+  # Delete any rows your studio does NOT staff
+  - anim
+  - comp
+  - fx
+  - lighting
+  - lookdev
+  - model
+  - render
+  - rig
+  # Optional — uncomment if applicable:
+  # - previs
+  # - roto
+  # - matte_paint
+  # - editorial
+  # - motion_graphics
+
+# ── 5. DCC Software ──────────────────────────────────────────────────────────
+dcc_software:
+  # Delete any tools your studio does NOT have a license for
+  - maya
+  - nuke
+  - houdini
+  - blender
+  # Optional — uncomment if applicable:
+  # - c4d
+  # - 3dsmax
+  # - substance
+  # - resolve
+
+# ── 6. Asset Types ───────────────────────────────────────────────────────────
+asset_types:
+  # The categories of assets that will be built in this project
+  - char
+  - prop
+  - env
+  - vehicle
+  - fx
+  # Optional — uncomment if applicable:
+  # - crowd
+  # - matte_paint
+  # - hdri
+
+# ── 7. Technical Specifications ──────────────────────────────────────────────
+technical:
+  frame_rate:       24                  # 24 | 25 | 30 | 48 | 60 | 23.976 | 29.97
+  frame_padding:    4                   # Digits in frame numbers: 4 → 0001, 3 → 001
+  color_space:      "ACEScg"           # ACEScg | sRGB | Linear | scene_linear
+  image_format:     "EXR"             # EXR | DPX | TIFF | PNG
+  delivery_format:  "H264_MP4"         # Dailies deliverable codec
+  resolution:       "1920x1080"        # e.g. 2048x1556 (2K) | 3840x2160 (4K UHD)
+  bit_depth:        16                  # 8 | 16 | 32 (EXR)
+
+# ── 8. Pipeline Feature Flags ────────────────────────────────────────────────
+pipeline:
+  enable_dependency_tracking: false    # true = scan .ma/.nk files for upstream refs
+  versioning_padding:         3        # 3 → v001 | 4 → v0001
+  naming_separator:           "_"      # Separator used in all pipeline filenames
+  enable_dailies_watermark:   false    # Burn-in studio name/date onto dailies
+  enable_auto_backup:         false    # Auto-version-bump on every manual save
+
+# ── 9. Team & Contacts ───────────────────────────────────────────────────────
+# Used for license key generation and admin record.
+contacts:
+  pipeline_td:
+    name:  "Your Pipeline TD Name"
+    email: "td@studiopipeline.com"
+  vfx_supervisor:
+    name:  "VFX Supervisor Name"
+    email: "supervisor@studio.com"
+  it_admin:
+    name:  "IT Admin Name"
+    email: "it@studio.com"
