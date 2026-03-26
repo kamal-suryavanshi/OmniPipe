@@ -29,7 +29,7 @@ This document outlines the strict quality-assurance testing checklist that must 
   Set `enable_dependency_tracking: true` globally inside `configs/schema.yaml`. Publish a dummy file natively and confirm the resulting JSON automatically injects the `dependencies` tracker array cleanly without crashing.
   
 - [ ] **Task 9: License System**
-  *(To be implemented...)*
+  Delete the physical `~/omnipipe.lic` key file and attempt to natively run `python -m omnipipe context`. Confirm the Typer CLI violently terminates execution with a `FATAL LICENSE ERROR` before loading the pipeline context. Then natively execute `python scripts/generate_license.py "OmniPipe Studio"` and confirm the cryptographic block seamlessly lifts.
 
 - [ ] **Task 10: Error Handling**
   *(To be implemented...)*
