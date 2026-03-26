@@ -67,4 +67,9 @@ class PublishEngine:
                 extractor.extract(instance)
             instance.is_extracted = True
             
+        # Phase 3: Metadata Logging (Task 7)
+        from omnipipe.core.metadata import generate_publish_metadata
+        if instance.is_valid:
+            generate_publish_metadata(instance)
+            
         return True
