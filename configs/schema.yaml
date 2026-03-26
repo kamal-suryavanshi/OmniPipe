@@ -1,5 +1,8 @@
 # Studio Pipeline Configuration
 
+# Global Client Toggles (Task 8)
+enable_dependency_tracking: false
+
 # The root directory where all project data is stored on network or disk.
 # Allows using env variables like {STUDIO_ROOT}
 project_root: "{STUDIO_ROOT}/{project}"
