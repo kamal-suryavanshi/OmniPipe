@@ -47,14 +47,15 @@ class PublishEngine:
 
     def run(self) -> bool:
         """
-        Executes the full pipeline strictness lifecycle:
-        1. Validations -> 2. Extractions -> 3. Metadata tracking
+        Executes the full pipeline strictness lifecycle per instance:
+        Phase 1: Validations → Phase 2: Extractions → Phase 2.5: Dependency Tracking → Phase 3: Metadata
         """
         print(f"\n[OmniPipe] Starting Publish Engine across {len(self.instances)} instances...")
-        
-        # Phase 1: Validations (Task 5)
+
         for instance in self.instances:
             print(f"  -> Validating {instance.name}...")
+
+            # Phase 1: Validators (Task 5)
             for validator in self.validators:
                 try:
                     validator.validate(instance)
@@ -63,26 +64,21 @@ class PublishEngine:
                     return False
             instance.is_valid = True
             print(f"  [✅ PASSED] Cleared all {len(self.validators)} security validators.")
-            
-        # Phase 2: Extractions (Task 6)
-        if instance.is_valid:
+
+            # Phase 2: Extractions (Task 6)
             for extractor in self.extractors:
                 print(f"  -> Extracting Output: {extractor.name}...")
                 extractor.extract(instance)
             instance.is_extracted = True
-            
-        # Phase 2.5: Dependency Tracking (Task 8)
-        if self.enable_tracking:
-            from omnipipe.core.dependencies import extract_dependencies
-            for instance in self.instances:
-                if instance.is_valid:
-                    deps = extract_dependencies(instance)
-                    instance.metadata["dependencies"] = deps
 
-        # Phase 3: Metadata Logging (Task 7)
-        from omnipipe.core.metadata import generate_publish_metadata
-        for instance in self.instances:
-            if instance.is_valid:
-                generate_publish_metadata(instance)
-            
+            # Phase 2.5: Dependency Tracking (Task 8) – conditional
+            if self.enable_tracking:
+                from omnipipe.core.dependencies import extract_dependencies
+                deps = extract_dependencies(instance)
+                instance.metadata["dependencies"] = deps
+
+            # Phase 3: Metadata Logging (Task 7)
+            from omnipipe.core.metadata import generate_publish_metadata
+            generate_publish_metadata(instance)
+
         return True
