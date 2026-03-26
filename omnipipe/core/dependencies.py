@@ -2,48 +2,70 @@ import os
 import re
 from typing import List
 from omnipipe.core.publish import PublishInstance
+from omnipipe.core.logger import setup_logger
 
-# Maya Ascii Reference Regex: matches commands like file -rdi 1 -ns "rig" ... "/path/to/file.ma";
-MAYA_REF_REGEX = re.compile(r'file\s+.*?-r\s+.*?\"([^\"]+)\";')
+log = setup_logger("omnipipe.dependencies")
 
-# Nuke Read Node Regex: natively matches `file /path/to/sequence.%04d.exr` inside node blocks
-NUKE_READ_REGEX = re.compile(r'^\s*file\s+([^\s]+)', re.MULTILINE)
+# Maya Ascii: captures file paths from `file -r ... "path/to/file.ma";`
+MAYA_REF_REGEX = re.compile(r'file\s+.*?-r\s+.*?"([^"]+)";')
+
+# Nuke: captures `file /path/to/sequence.%04d.exr` inside Read node blocks
+NUKE_READ_REGEX = re.compile(r"^\s*file\s+([^\s]+)", re.MULTILINE)
+
 
 def extract_dependencies(instance: PublishInstance) -> List[str]:
     """
-    Dynamically parses the raw Ascii data of the physically published file 
-    to mathematically extract exact upstream dependencies without needing the DCC open whatsoever.
+    Reads the raw ASCII source of a Maya (.ma) or Nuke (.nk) file
+    and extracts all upstream file references without opening the DCC.
     """
-    dependencies = []
+    dependencies: List[str] = []
     source_path = instance.source_path
-    
+
     if not os.path.exists(source_path):
+        log.warning("[Dependencies] Source file not on disk — cannot scan: %s", source_path)
         return dependencies
-        
-    print(f"  [DEPENDENCIES] Scanning raw Ascii source blocks for {instance.name}...")
-        
+
+    ext = os.path.splitext(source_path)[1].lower()
+    if ext not in (".ma", ".nk"):
+        log.info("[Dependencies] Unsupported file type '%s' — skipping dependency scan.", ext)
+        return dependencies
+
+    log.info("[Dependencies] Scanning '%s' for upstream references (type: %s)…",
+             instance.name, ext)
+
     try:
-        # Read the file purely as raw text (works for .ma and .nk)
         with open(source_path, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
-            
-            # 1. Parse Maya Ascii Dependencies
-            if source_path.endswith(".ma"):
-                matches = MAYA_REF_REGEX.findall(content)
-                for match in matches:
-                    dependencies.append(os.path.normpath(match))
-                    
-            # 2. Parse Nuke Script Dependencies
-            elif source_path.endswith(".nk"):
-                matches = NUKE_READ_REGEX.findall(content)
-                for match in matches:
-                    dependencies.append(os.path.normpath(match))
-                    
+
+        if ext == ".ma":
+            matches = MAYA_REF_REGEX.findall(content)
+            log.debug("[Dependencies] Maya regex matched %d raw reference(s).", len(matches))
+        else:  # .nk
+            matches = NUKE_READ_REGEX.findall(content)
+            log.debug("[Dependencies] Nuke regex matched %d raw reference(s).", len(matches))
+
+        for match in matches:
+            norm = os.path.normpath(match)
+            dependencies.append(norm)
+            log.debug("[Dependencies]   → %s", norm)
+
     except Exception as e:
-        print(f"  [DEPENDENCIES] Fatal error parsing raw file {source_path}: {e}")
-        
-    # Purge duplicates
-    dependencies = list(set(dependencies))
-    
-    print(f"  [DEPENDENCIES] Intelligently parsed {len(dependencies)} upstream physical references natively from text strings.")
-    return dependencies
+        log.error("[Dependencies] FAILED to parse '%s': %s", source_path, e)
+        return dependencies
+
+    # Deduplicate while preserving insertion order
+    seen: set = set()
+    unique_deps = []
+    for d in dependencies:
+        if d not in seen:
+            seen.add(d)
+            unique_deps.append(d)
+
+    if unique_deps:
+        log.info("[Dependencies] %d unique upstream reference(s) found in '%s'.",
+                 len(unique_deps), instance.name)
+    else:
+        log.info("[Dependencies] No upstream references found in '%s'. "
+                 "File may be standalone or reference pattern did not match.", instance.name)
+
+    return unique_deps
