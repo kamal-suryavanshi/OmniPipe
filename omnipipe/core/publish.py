@@ -25,8 +25,9 @@ class PublishEngine:
     The central orchestrator. Person A built this engine to blindly run 
     Validators (Task 5) and Extractors (Task 6) across any PublishInstance.
     """
-    def __init__(self):
+    def __init__(self, enable_tracking: bool = False):
         self.instances: List[PublishInstance] = []
+        self.enable_tracking = enable_tracking
         self.validators = []  # Will be populated in Task 5
         self.extractors = []  # Will be populated in Task 6
         
@@ -67,9 +68,18 @@ class PublishEngine:
                 extractor.extract(instance)
             instance.is_extracted = True
             
+        # Phase 2.5: Dependency Tracking (Task 8)
+        if self.enable_tracking:
+            from omnipipe.core.dependencies import extract_dependencies
+            for instance in self.instances:
+                if instance.is_valid:
+                    deps = extract_dependencies(instance)
+                    instance.metadata["dependencies"] = deps
+
         # Phase 3: Metadata Logging (Task 7)
         from omnipipe.core.metadata import generate_publish_metadata
-        if instance.is_valid:
-            generate_publish_metadata(instance)
+        for instance in self.instances:
+            if instance.is_valid:
+                generate_publish_metadata(instance)
             
         return True

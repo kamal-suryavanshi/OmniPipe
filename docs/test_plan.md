@@ -26,7 +26,7 @@ This document outlines the strict quality-assurance testing checklist that must 
   After a simulated publish, navigate to the output folder and confirm the payload `{filename}.json` file was autonomously created and correctly securely recorded the local OS user signature.
 
 - [ ] **Task 8: Dependency Tracking**
-  *(To be implemented...)*
+  Set `enable_dependency_tracking: true` globally inside `configs/schema.yaml`. Publish a dummy file natively and confirm the resulting JSON automatically injects the `dependencies` tracker array cleanly without crashing.
   
 - [ ] **Task 9: License System**
   *(To be implemented...)*
