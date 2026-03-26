@@ -9,6 +9,7 @@ nav:
   - Studio Setup & Onboarding:
     - Onboarding Guide: setup/onboarding.md
     - Intake Form Reference: setup/intake_form_reference.md
+    - Pipeline Tools Reference: setup/pipeline_tools.md
   - Architecture Walkthroughs:
     - Task 1 & 2 (Repo & Context): walkthroughs/task_1_2.md
     - Task 3 (Path Manager): walkthroughs/task_3.md
