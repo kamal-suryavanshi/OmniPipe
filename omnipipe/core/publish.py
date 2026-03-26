@@ -33,14 +33,30 @@ class PublishEngine:
     def add_instance(self, instance: PublishInstance):
         self.instances.append(instance)
         
+    def register_validator(self, validator):
+        """Plugin injection for Task 5 Gatekeepers"""
+        self.validators.append(validator)
+
     def run(self) -> bool:
         """
         Executes the full pipeline strictness lifecycle:
         1. Validations -> 2. Extractions -> 3. Metadata tracking
         """
-        print(f"Starting Publish Engine across {len(self.instances)} instances...")
+        print(f"\n[OmniPipe] Starting Publish Engine across {len(self.instances)} instances...")
         
-        # TO-DO for Task 5: Run self.validators here
+        # Phase 1: Validations (Task 5)
+        for instance in self.instances:
+            print(f"  -> Validating {instance.name}...")
+            for validator in self.validators:
+                try:
+                    validator.validate(instance)
+                except Exception as e:
+                    print(f"  [❌ FAILED] Validation Error on {instance.name}: {e}")
+                    return False
+            instance.is_valid = True
+            print(f"  [✅ PASSED] Cleared all {len(self.validators)} security validators.")
+            
+        # Phase 2: Extractions (Task 6)
         # TO-DO for Task 6: Run self.extractors here
         
         return True
