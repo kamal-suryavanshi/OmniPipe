@@ -37,6 +37,10 @@ class PublishEngine:
         """Plugin injection for Task 5 Gatekeepers"""
         self.validators.append(validator)
 
+    def register_extractor(self, extractor):
+        """Plugin injection for Task 6 Outputs"""
+        self.extractors.append(extractor)
+
     def run(self) -> bool:
         """
         Executes the full pipeline strictness lifecycle:
@@ -57,6 +61,10 @@ class PublishEngine:
             print(f"  [✅ PASSED] Cleared all {len(self.validators)} security validators.")
             
         # Phase 2: Extractions (Task 6)
-        # TO-DO for Task 6: Run self.extractors here
-        
+        if instance.is_valid:
+            for extractor in self.extractors:
+                print(f"  -> Extracting Output: {extractor.name}...")
+                extractor.extract(instance)
+            instance.is_extracted = True
+            
         return True

@@ -7,8 +7,9 @@ nav:
   - CLI Cheatsheet (Usage): cheatsheet.md
   - Master Test Plan: test_plan.md
   - Architecture Walkthroughs:
-    - Day 1 and 2: walkthroughs/day_1_and_2.md
-    - Day 3: walkthroughs/day_3.md
-    - Day 4 (DCC Integrations): walkthroughs/day_4.md
+    - Task 1 & 2 (Repo & Context): walkthroughs/task_1_2.md
+    - Task 3 (Path Manager): walkthroughs/task_3.md
+    - DCC Integrations (Person B): walkthroughs/dcc_integrations.md
     - Task 4 (Publish Design): walkthroughs/task_4.md
     - Task 5 (Validators): walkthroughs/task_5.md
+    - Task 6 (Extractors): walkthroughs/task_6.md
