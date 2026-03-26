@@ -8,12 +8,12 @@ This section documents all six production-gap tools added to OmniPipe after the 
 
 | Tool | Type | What it solves |
 |---|---|---|
-| [`init_studio.py --config`](#gap-1--headless-studio-init) | Script | Headless/CI studio init from intake YAML |
-| [`install_workstation.py`](#gap-2--artist-workstation-installer) | Script | One-command artist machine setup |
-| [`omnipipe create-shot`](#gap-3--create-shot-cli) | CLI | Add shots mid-project without re-running init |
-| [NAS permission check](#gap-4--nas-permission-validation) | Built-in | Fail fast if NAS not writable before init |
-| [`omnipipe doctor`](#gap-5--omnipipe-doctor) | CLI | Full environment health check |
-| [`omnipipe.sh` / `omnipipe.bat`](#gap-6--os-launchers) | Launcher | Double-click or alias CLI entry point |
+| [`init_studio.py --config`](#gap-1-headless-studio-init) | Script | Headless/CI studio init from intake YAML |
+| [`install_workstation.py`](#gap-2-artist-workstation-installer) | Script | One-command artist machine setup |
+| [`omnipipe create-shot`](#gap-3-create-shot-cli) | CLI | Add shots mid-project without re-running init |
+| [NAS permission check](#gap-4-nas-permission-validation) | Built-in | Fail fast if NAS not writable before init |
+| [`omnipipe doctor`](#gap-5-omnipipe-doctor) | CLI | Full environment health check |
+| [`omnipipe.sh` / `omnipipe.bat`](#gap-6-os-launchers) | Launcher | Double-click or alias CLI entry point |
 
 ---
 

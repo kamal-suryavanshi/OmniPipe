@@ -7,6 +7,7 @@ nav:
   - CLI Cheatsheet (Usage): cheatsheet.md
   - Master Test Plan: test_plan.md
   - Studio Setup & Onboarding:
+    - "▶ Studio Setup Guide (Start Here)": setup/studio_setup_guide.md
     - Onboarding Guide: setup/onboarding.md
     - Intake Form Reference: setup/intake_form_reference.md
     - Pipeline Tools Reference: setup/pipeline_tools.md
