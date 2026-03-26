@@ -12,8 +12,9 @@
 
 What this script does
 ─────────────────────
-  1. Interactively prompts for studio-specific settings (or reads a
-     pre-filled config file for fully-automated CI deployments).
+  1. Reads a pre-filled client_intake.yaml for fully-automated CI/remote
+     deployments (--config flag), OR prompts interactively if no file
+     is given.
   2. Generates a minimal studio config (studio_settings.yaml) next to
      the existing schema.yaml.
   3. Physically creates the full folder hierarchy on disk, including
@@ -39,6 +40,11 @@ import argparse
 import textwrap
 from datetime import datetime
 from pathlib import Path
+try:
+    import yaml
+    _YAML_AVAILABLE = True
+except ImportError:
+    _YAML_AVAILABLE = False
 
 # ── stdlib-only: no omnipipe imports so this script is fully portable ──────────
 
@@ -107,23 +113,109 @@ def _write_file(path: Path, content: str, dry_run: bool):
             path.write_text(content, encoding="utf-8")
 
 
+def _check_nas_permissions(studio_root: str, dry_run: bool) -> bool:
+    """
+    Gap 4: Verifies the studio root exists and is writable before touching the disk.
+    Writes + deletes a temporary probe file to confirm write access.
+    Returns True on success, False (with printed message) on failure.
+    """
+    root = Path(studio_root)
+
+    if dry_run:
+        print(f"  [DRY RUN] Would check write permissions at: {root}")
+        return True
+
+    if not root.exists():
+        print(f"\n  ❌ NAS root does NOT exist: {root}")
+        print("     Please mount the NAS drive and try again.\n")
+        return False
+
+    probe = root / ".omnipipe_probe"
+    try:
+        probe.write_text("omnipipe permission probe", encoding="utf-8")
+        probe.unlink()
+        print(f"  [✓] NAS write permission confirmed: {root}")
+        return True
+    except OSError as e:
+        print(f"\n  ❌ Cannot write to NAS root: {root}")
+        print(f"     OS Error: {e}")
+        print("     Ask your IT Admin to grant write access and try again.\n")
+        return False
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Folder-tree builder
 # ──────────────────────────────────────────────────────────────────────────────
+
+def load_from_intake(config_path: str) -> dict:
+    """
+    Reads a client_intake.yaml and normalises it into the flat cfg dict
+    that the rest of this script expects.
+    Raises FileNotFoundError or ValueError on bad input.
+    """
+    if not _YAML_AVAILABLE:
+        raise RuntimeError(
+            "PyYAML is not installed. Run: pip install pyyaml\n"
+            "Or use the interactive mode (omit --config)."
+        )
+    path = Path(config_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Intake config not found: {path}")
+
+    with open(path, "r", encoding="utf-8") as f:
+        raw = yaml.safe_load(f)
+
+    try:
+        fs   = raw["filesystem"]
+        proj = raw["project_structure"]
+        tech = raw.get("technical", {})
+        pipe = raw.get("pipeline", {})
+
+        cfg = {
+            "studio_name":               raw["studio"]["name"],
+            "project_code":              raw["studio"]["project_code"],
+            "studio_root":               fs["studio_root"],
+            "sequences":                 proj["sequences"]["count"],
+            "shots_per_sequence":        proj["shots"]["per_sequence"],
+            "seq_naming":                proj["sequences"].get("naming", "sq{:03d}"),
+            "shot_naming":               proj["shots"].get("naming", "sh{:03d}0"),
+            "departments":               raw.get("departments",  SHOT_TASKS),
+            "dcc_software":              raw.get("dcc_software", DCCS),
+            "asset_types":               raw.get("asset_types",  ASSET_TYPES),
+            "frame_rate":                tech.get("frame_rate",   24),
+            "frame_padding":             tech.get("frame_padding", 4),
+            "color_space":               tech.get("color_space",  "ACEScg"),
+            "image_format":              tech.get("image_format", "EXR"),
+            "enable_dependency_tracking": pipe.get("enable_dependency_tracking", False),
+        }
+    except KeyError as e:
+        raise ValueError(f"Intake YAML is missing required field: {e}")
+
+    return cfg
+
 
 def build_tree(cfg: dict, dry_run: bool) -> list:
     """
     Materialises the complete studio folder hierarchy.  Returns a list of
     all paths that were newly created (skips paths that already existed).
+    Uses cfg["departments"], cfg["dcc_software"], and cfg["asset_types"]
+    so that intake-form-driven runs are fully customised per client.
     """
     root      = Path(cfg["studio_root"])
     proj      = cfg["project_code"]
     sequences = cfg["sequences"]
     shots_per = cfg["shots_per_sequence"]
+    tasks     = cfg.get("departments",  SHOT_TASKS)
+    dccs      = cfg.get("dcc_software", DCCS)
+    atypes    = cfg.get("asset_types",  ASSET_TYPES)
+    seq_fmt   = cfg.get("seq_naming",   "sq{:03d}")
+    shot_fmt  = cfg.get("shot_naming",  "sh{:03d}0")
     created: list = []
 
     _sep()
     print(f"  Building folder tree under: {root}")
+    print(f"  Departments  : {', '.join(tasks)}")
+    print(f"  DCCs         : {', '.join(dccs)}")
     print(f"  {'[DRY RUN — no folders will be created]' if dry_run else 'Mode: LIVE'}")
     _sep()
 
@@ -135,28 +227,24 @@ def build_tree(cfg: dict, dry_run: bool) -> list:
         _mkdir(proj_root / top, created, dry_run)
 
     # ── 2. Asset library ──────────────────────────────────────────────────────
-    for atype in ASSET_TYPES:
-        for dcc in DCCS:
+    for atype in atypes:
+        for dcc in dccs:
             for sub in ["work", "publish"]:
                 _mkdir(proj_root / "assets" / atype / "_template" / sub / dcc, created, dry_run)
 
     # ── 3. Sequences → Shots ─────────────────────────────────────────────────
     for seq_idx in range(1, sequences + 1):
-        seq_name = f"sq{seq_idx:03d}"
-
+        seq_name  = seq_fmt.format(seq_idx)
         for shot_idx in range(1, shots_per + 1):
-            shot_name = f"sh{shot_idx:03d}0"   # e.g. sh0010, sh0020 …
+            shot_name = shot_fmt.format(shot_idx)
             shot_root = proj_root / "sequences" / seq_name / shot_name
 
-            # Thumbnail / editorial placeholder
             _mkdir(shot_root / "_editorial", created, dry_run)
 
-            for task in SHOT_TASKS:
-                for dcc in DCCS:
+            for task in tasks:
+                for dcc in dccs:
                     _mkdir(shot_root / "work"    / dcc / task, created, dry_run)
                     _mkdir(shot_root / "publish" / dcc / task, created, dry_run)
-
-                # Render outputs (DCC-agnostic)
                 _mkdir(shot_root / "render" / task, created, dry_run)
                 _mkdir(shot_root / "cache"  / task, created, dry_run)
 
@@ -167,11 +255,10 @@ def build_tree(cfg: dict, dry_run: bool) -> list:
 
     # ── 5. Software / vendor landing zone ─────────────────────────────────────
     _mkdir(root / "_software", created, dry_run)
-    for dcc in DCCS:
+    for dcc in dccs:
         _mkdir(root / "_software" / dcc, created, dry_run)
 
     # ── 6. Shared pipeline config snapshot ───────────────────────────────────
-    # Copy schema.yaml into the admin/configs area as a read reference
     schema_src = Path(__file__).parent.parent / "configs" / "schema.yaml"
     if schema_src.exists() and not dry_run:
         import shutil
@@ -249,11 +336,21 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent("""
             Examples:
+              # Interactive mode (prompts for each field)
               python3 scripts/init_studio.py
-              python3 scripts/init_studio.py --dry-run
-              python3 scripts/init_studio.py --force
+
+              # Headless / CI mode (reads client intake form)
+              python3 scripts/init_studio.py --config configs/client_intake.yaml
+
+              # Dry-run to preview without touching disk
+              python3 scripts/init_studio.py --config configs/client_intake.yaml --dry-run
+
+              # Force re-run over existing install
+              python3 scripts/init_studio.py --config configs/client_intake.yaml --force
         """)
     )
+    parser.add_argument("--config",  metavar="FILE",
+                        help="Path to a filled client_intake.yaml. Skips all interactive prompts.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Preview what would be created without touching the disk.")
     parser.add_argument("--force",   action="store_true",
@@ -262,26 +359,39 @@ def main():
 
     _banner()
 
-    # ── Gather studio-specific settings interactively ─────────────────────────
-    print("  Please enter details for this studio deployment.")
-    print("  Press Enter to accept the default shown in [brackets].\n")
+    # ── Gather settings: from file (headless) or interactively ───────────────
+    if args.config:
+        print(f"  Loading configuration from: {args.config}")
+        try:
+            cfg = load_from_intake(args.config)
+            print(f"  [✓] Intake form loaded — studio: {cfg['studio_name']}")
+        except (FileNotFoundError, ValueError, RuntimeError) as e:
+            print(f"\n  [✗] ERROR reading intake form: {e}\n")
+            sys.exit(1)
+    else:
+        print("  Please enter details for this studio deployment.")
+        print("  Press Enter to accept the default shown in [brackets].\n")
 
-    default_root = (
-        r"C:\Studio" if platform.system() == "Windows"
-        else os.path.expanduser("~/Studio")
-    )
+        default_root = (
+            r"C:\Studio" if platform.system() == "Windows"
+            else os.path.expanduser("~/Studio")
+        )
 
-    cfg = {
-        "studio_name":       _prompt("Studio name",             "Acme VFX Studio"),
-        "project_code":      _prompt("Project code",            "PROJ"),
-        "studio_root":       _prompt("Studio root path",        default_root),
-        "sequences":     int(_prompt("Number of sequences",     "5")),
-        "shots_per_sequence": int(_prompt("Shots per sequence", "10")),
-        "frame_rate":    int(_prompt("Frame rate (fps)",        "24")),
-        "frame_padding": int(_prompt("Frame padding (digits)",  "4")),
-        "color_space":       _prompt("Colour space",            "ACEScg"),
-        "image_format":      _prompt("Primary image format",    "EXR"),
-    }
+        cfg = {
+            "studio_name":        _prompt("Studio name",            "Acme VFX Studio"),
+            "project_code":       _prompt("Project code",           "PROJ"),
+            "studio_root":        _prompt("Studio root path",       default_root),
+            "sequences":      int(_prompt("Number of sequences",    "5")),
+            "shots_per_sequence": int(_prompt("Shots per sequence", "10")),
+            "frame_rate":     int(_prompt("Frame rate (fps)",       "24")),
+            "frame_padding":  int(_prompt("Frame padding (digits)", "4")),
+            "color_space":        _prompt("Colour space",           "ACEScg"),
+            "image_format":       _prompt("Primary image format",   "EXR"),
+            # Defaults when using interactive mode
+            "departments":  SHOT_TASKS,
+            "dcc_software": DCCS,
+            "asset_types":  ASSET_TYPES,
+        }
 
     _sep()
     print(f"  Studio Name  : {cfg['studio_name']}")
