@@ -1,4 +1,5 @@
 site_name: OmniPipe Documentation
+site_url: https://kamal-suryavanshi.github.io/OmniPipe/
 site_description: A dynamic CG Studio Pipeline
 theme: readthedocs
 

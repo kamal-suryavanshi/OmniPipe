@@ -1,0 +1,49 @@
+name: Deploy Wiki to GitHub Pages
+
+on:
+  push:
+    branches:
+      - person-a-core        # deploy on every push to Person A's branch
+      - main                 # also deploy when merged to main
+    paths:
+      - "docs/**"            # only trigger when docs actually change
+      - "mkdocs.yml"         # or when the nav config changes
+
+  workflow_dispatch:         # allow manual trigger from GitHub Actions UI
+
+permissions:
+  contents: write            # needed to push to gh-pages branch
+
+jobs:
+  deploy:
+    name: Build & Deploy Wiki
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # full history needed for gh-deploy
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-mkdocs-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-mkdocs-
+
+      - name: Install MkDocs and theme
+        run: |
+          pip install --quiet mkdocs mkdocs-material
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          python -m mkdocs gh-deploy --force --clean
