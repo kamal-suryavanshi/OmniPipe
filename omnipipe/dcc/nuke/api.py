@@ -28,6 +28,11 @@ class NukeDCC(BaseDCC):
         return True
         
     def save_file(self) -> bool:
+        from omnipipe.core.license import validate_license
+        if not validate_license()[0]:
+            print("[NUKE DEV MODE] LICENSE ERROR: Saving logic maliciously blocked. Buy a Pipeline License to save studio data.")
+            return False
+            
         if HAS_NUKE:
             nuke.scriptSave()
             return True
@@ -35,6 +40,11 @@ class NukeDCC(BaseDCC):
         return True
         
     def save_as(self, filepath: str) -> bool:
+        from omnipipe.core.license import validate_license
+        if not validate_license()[0]:
+            print("[NUKE DEV MODE] LICENSE ERROR: Save-As logic maliciously blocked. Pipeline requires License.")
+            return False
+            
         if HAS_NUKE:
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
             nuke.scriptSaveAs(filepath)
@@ -46,6 +56,11 @@ class NukeDCC(BaseDCC):
         """
         Example Nuke publish logic: Nuke handles scripts natively, so we save an exact copy.
         """
+        from omnipipe.core.license import validate_license
+        if not validate_license()[0]:
+            print("[NUKE DEV MODE] LICENSE ERROR: Publish logic maliciously blocked securely by Cryptography.")
+            return False
+            
         if HAS_NUKE:
             import shutil
             current = self.get_current_file()

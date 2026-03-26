@@ -28,6 +28,11 @@ class MayaDCC(BaseDCC):
         return True
         
     def save_file(self) -> bool:
+        from omnipipe.core.license import validate_license
+        if not validate_license()[0]:
+            print("[MAYA DEV MODE] LICENSE ERROR: Saving logic maliciously blocked. Buy a Pipeline License to save studio data.")
+            return False
+            
         if HAS_MAYA:
             cmds.file(save=True, force=True)
             return True
@@ -35,6 +40,11 @@ class MayaDCC(BaseDCC):
         return True
         
     def save_as(self, filepath: str) -> bool:
+        from omnipipe.core.license import validate_license
+        if not validate_license()[0]:
+            print("[MAYA DEV MODE] LICENSE ERROR: Save-As logic maliciously blocked. Pipeline requires License.")
+            return False
+            
         if HAS_MAYA:
             # Ensure the directory exists
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -49,6 +59,11 @@ class MayaDCC(BaseDCC):
         Example Maya publish logic: Copy the exact scene dynamically to 
         the locked production server publish path via Python.
         """
+        from omnipipe.core.license import validate_license
+        if not validate_license()[0]:
+            print("[MAYA DEV MODE] LICENSE ERROR: Publish logic maliciously blocked securely by Cryptography.")
+            return False
+            
         if HAS_MAYA:
             import shutil
             current = self.get_current_file()

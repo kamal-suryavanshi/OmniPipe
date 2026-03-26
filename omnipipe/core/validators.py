@@ -46,3 +46,15 @@ class NamingConventionValidator(BaseValidator):
             raise ValueError(f"[{self.name}] Invalid characters detected in filename: '{base_name}'")
             
         return True
+
+class LicenseValidator(BaseValidator):
+    """
+    Gatekeeper that natively prevents any physical data extraction or metadata JSON 
+    from writing to the pipeline repository if a secure cryptography license key is missing.
+    """
+    def validate(self, instance: PublishInstance) -> bool:
+        from omnipipe.core.license import validate_license
+        is_valid, msg = validate_license()
+        if not is_valid:
+            raise ValueError(f"[{self.name}] {msg}")
+        return True

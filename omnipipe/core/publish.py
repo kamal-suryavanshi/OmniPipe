@@ -28,8 +28,11 @@ class PublishEngine:
     def __init__(self, enable_tracking: bool = False):
         self.instances: List[PublishInstance] = []
         self.enable_tracking = enable_tracking
-        self.validators = []  # Will be populated in Task 5
-        self.extractors = []  # Will be populated in Task 6
+        from omnipipe.core.validators import FileExistsValidator, NamingConventionValidator, LicenseValidator
+        from omnipipe.core.extractors import EXRSequenceExtractor, PlayblastExtractor
+        
+        self.validators = [LicenseValidator(), FileExistsValidator(), NamingConventionValidator()]
+        self.extractors = [EXRSequenceExtractor(), PlayblastExtractor()]
         
     def add_instance(self, instance: PublishInstance):
         self.instances.append(instance)

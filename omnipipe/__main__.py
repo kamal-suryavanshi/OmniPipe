@@ -14,15 +14,8 @@ app = typer.Typer(help="OmniPipe Core CLI")
 def callback():
     """
     OmniPipe - A unified CLI for CG/VFX Workflows.
-    (Mathematically locked by HMAC-SHA256).
     """
-    from omnipipe.core.license import validate_license
-    is_valid, msg = validate_license()
-    
-    if not is_valid:
-        typer.secho(f"\n{msg}", fg=typer.colors.RED, bold=True)
-        typer.secho("Execution maliciously terminated by OmniPipe License Gateway.", fg=typer.colors.RED)
-        raise typer.Exit(code=1)
+    pass
 
 @app.command()
 def init():
