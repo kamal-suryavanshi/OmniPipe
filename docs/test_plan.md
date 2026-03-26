@@ -32,7 +32,7 @@ This document outlines the strict quality-assurance testing checklist that must 
   Delete the physical `~/omnipipe.lic` key file and attempt to natively run `python -m omnipipe context`. Confirm the Typer CLI violently terminates execution with a `FATAL LICENSE ERROR` before loading the pipeline context. Then natively execute `python scripts/generate_license.py "OmniPipe Studio"` and confirm the cryptographic block seamlessly lifts.
 
 - [ ] **Task 10: Error Handling**
-  *(To be implemented...)*
+  Open `omnipipe/__main__.py` and physically inject a runtime error natively (e.g., `1/0`) inside any initialized command. Run the CLI mechanically. Navigate straight to `~/omnipipe/logs/pipeline.log` to visually verify the exact detailed programmatic stack trace was fully mathematically captured!
 
 ## DCC Headless Mechanics (Person B)
 
