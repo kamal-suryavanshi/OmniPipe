@@ -41,7 +41,8 @@ class PathResolver:
         log.info("Schema loaded successfully: %s", self.schema_path.name)
         return data
 
-    def resolve(self, template_name: str, context: PipelineContext) -> str:
+    def resolve(self, template_name: str, context: PipelineContext,
+                check_exists: bool = False) -> str:
         templates = self.schema.get("templates", {})
         if template_name not in templates:
             log.error("Template '%s' not found in schema. Available: %s",
@@ -57,6 +58,18 @@ class PathResolver:
 
         resolved = self._resolve_recursive(templates[template_name], templates, raw_env)
         log.debug("Resolved '%s' → %s", template_name, resolved)
+
+        if check_exists:
+            import os as _os
+            if not _os.path.exists(resolved):
+                log.warning(
+                    "Resolved path does NOT exist on disk: '%s' "
+                    "(template='%s'). File may not have been written yet.",
+                    resolved, template_name
+                )
+            else:
+                log.debug("Existence check passed for: %s", resolved)
+
         return resolved
 
     def _resolve_recursive(self, template_str: str, templates: dict, env: dict) -> str:
