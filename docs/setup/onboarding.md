@@ -113,7 +113,9 @@ python3 -c "import yaml; yaml.safe_load(open('configs/client_intake.yaml'))"
 ### 3.2 — Dry-run first (always)
 
 ```bash
-python3 scripts/init_studio.py --dry-run
+python3 scripts/init_studio.py \
+    --config configs/client_intake.yaml \
+    --dry-run
 ```
 
 Review the output. Confirm:
@@ -127,18 +129,19 @@ Review the output. Confirm:
 
 ```bash
 # Mac / Linux
-python3 scripts/init_studio.py
+python3 scripts/init_studio.py --config configs/client_intake.yaml
 
 # Windows
-python scripts\init_studio.py
+python scripts\init_studio.py --config configs\client_intake.yaml
 ```
 
 Type `yes` when prompted to confirm. The script will:
 
-1. Create the complete folder hierarchy on the NAS
-2. Write `configs/studio_settings.yaml` with all client-specific settings
-3. Copy `schema.yaml` into `{PROJECT_ROOT}/_admin/configs/`
-4. Write a `.omnipipe_stamp` file to prevent accidental re-runs
+1. **Check NAS write permissions** (probe file test — fails immediately if not writable)
+2. Create the complete folder hierarchy on the NAS
+3. Write `configs/studio_settings.yaml` with all client-specific settings
+4. Copy `schema.yaml` into `{PROJECT_ROOT}/_admin/configs/`
+5. Write a `.omnipipe_stamp` file to prevent accidental re-runs
 
 ### 3.4 — What gets created
 
@@ -212,20 +215,23 @@ python3 -m omnipipe context {PROJECT_CODE} --sequence sq001 --shot sh0010
 
 ---
 
-## What's Still Missing (Recommended Next Steps)
+## What's Still Coming
 
-The following are not yet built but should be considered for a production-grade deployment:
+All Person A production gaps have been implemented. The remaining work belongs to Person B and C:
 
-| Gap | Priority | Notes |
-|---|---|---|
-| `--config` flag on `init_studio.py` | 🔴 High | Read `client_intake.yaml` directly, skip all prompts for fully automated CI/remote setup |
-| Artist workstation installer script | 🔴 High | One-click deploy: clone repo, install deps, copy license, test DCC hooks |
-| `create-shot` CLI command | 🟡 Medium | Add individual shots post-init without re-running the full script |
-| NAS permission validation | 🟡 Medium | Verify R/W access before creating folders (avoid silent permission failures) |
-| `omnipipe doctor` health check | 🟡 Medium | Post-deploy verification: license OK? NAS mounted? Schema valid? |
-| Email/Slack notification on publish | 🟢 Low | Notify supervisor when a shot is published |
-| Studio settings UI | 🟢 Low | A simple web form to generate `client_intake.yaml` without editing raw YAML |
-| Windows `.bat` / Mac `.sh` wrapper | 🟢 Low | One-double-click launcher for non-technical studio staff |
+| Item | Owner | Priority | Status |
+|---|---|---|---|
+| Maya shelf/plugin — real `cmds` API hooks | Person B | 🔴 High | 🔜 Pending |
+| Nuke panel — `nuke.scriptSave()` hooks | Person B | 🔴 High | 🔜 Pending |
+| Houdini `hou.hipFile.save()` override | Person B | 🟡 Medium | 🔜 Pending |
+| Kitsu / Asset Management integration | Person C | 🔴 High | 🔜 Pending |
+| `omnipipe login` — Kitsu auth | Person C | 🔴 High | 🔜 Pending |
+| Shot/asset status sync on publish | Person C | 🟡 Medium | 🔜 Pending |
+| Email/Slack notification on publish | Person B or C | 🟢 Low | 🔜 Pending |
+| Studio settings web UI (intake form generator) | Person C | 🟢 Low | 🔜 Pending |
+
+> **Person A items completed:** `--config` flag, workstation installer, `create-shot`, NAS permission check, `omnipipe doctor`, OS launchers.  
+> See [Pipeline Tools Reference](pipeline_tools.md) for full documentation.
 
 ---
 
