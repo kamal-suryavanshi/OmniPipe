@@ -37,5 +37,14 @@ python -m omnipipe [COMMAND] [OPTIONS]
   ```
   *(Expected Output: Resolves and prints exact physical paths for the Work File and Publish File)*
 
+### 4. `test-dcc`
+- **Who:** Person B / Developers
+- **Description:** Directly pings the headless Maya or Nuke plugins outside the software to ensure the `BaseDCC` save/publish hooks execute safely without crashing.
+- **Valid Example:**
+  ```bash
+  python -m omnipipe test-dcc nuke
+  ```
+  *(Expected Output: Simulated secure save and publish dummy terminal outputs)*
+
 ---
-_Note: More features (Publishing, Workfile Manager) will be added here as Day 4+ progresses!_
+_Note: More features (Publishing, Workfile Manager) will be added here as Day 5+ progresses!_
