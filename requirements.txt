@@ -1,10 +1,14 @@
 # OmniPipe Core Vendorized Dependencies
-# Note: Artists do NOT need to run this file. 
+# Note: Artists do NOT need to run this file.
 # This is solely for Pipeline Developers to rebuild the vendor/ folder if needed.
 
+# ── CLI & config ──────────────────────────────────────────────────────────────
 typer>=0.15.1
 pyyaml>=6.0.1
-gazu>=0.8.21
+colorama>=0.4.6      # Windows Click/Typer compatibility
 
-# Cross-platform hidden dependencies (Explicitly tracked for Windows Click/Typer)
-colorama>=0.4.6
+# ── Asset management ──────────────────────────────────────────────────────────
+gazu>=0.8.21          # Kitsu API client (Person C)
+
+# ── License server phone-home (Layer 2 DRM) ───────────────────────────────────
+requests>=2.31.0      # Used by omnipipe/core/license.py for heartbeat calls

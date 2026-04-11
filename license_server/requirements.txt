@@ -1,0 +1,12 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+# Person C TODO: add when switching to Postgres
+# sqlalchemy>=2.0.0
+# alembic>=1.13.0
+# asyncpg>=0.29.0
+# Person C TODO: add for rate limiting
+# slowapi>=0.1.9
+# Person C TODO: add for JWT admin auth
+# python-jose[cryptography]>=3.3.0
+# passlib[bcrypt]>=1.7.4

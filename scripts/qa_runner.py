@@ -5,6 +5,7 @@ Maps directly to: docs/test_plan.md - "Pipeline Core Validation (Person A)"
 import os
 import sys
 import json
+import datetime
 import traceback
 import shutil
 
@@ -253,6 +254,72 @@ def test_task_10():
         "Log file exists but appears empty!"
 
 run_test("Task 10", "Logger creates ~/omnipipe/logs/pipeline.log and writes entries", test_task_10)
+
+# -----------------------------------------------------------------------
+# LICENSE SERVER: Phase 2 phone-home tests (stubs — Person C implements server)
+# -----------------------------------------------------------------------
+
+def test_phone_home_unreachable_triggers_grace():
+    """
+    With no license server running, phone_home() should fall back gracefully
+    and write ~/.omnipipe_grace (not raise, not block).
+    """
+    import tempfile, shutil
+    grace_path = os.path.expanduser("~/.omnipipe_grace")
+    # Remove any existing grace file so we get a clean test
+    if os.path.exists(grace_path):
+        os.remove(grace_path)
+
+    # Point to a definitely-unreachable server
+    os.environ["OMNIPIPE_LICENSE_SERVER"] = "http://127.0.0.1:19999"
+    try:
+        from omnipipe.core import license as lic_mod
+        lic_mod._LICENSE_SERVER_URL = "http://127.0.0.1:19999"
+        valid, msg = lic_mod.phone_home(
+            studio_id="test-000", studio_name="QA Studio", dcc="nuke"
+        )
+        assert valid is True, f"Grace period should allow operation, got: {msg}"
+        assert os.path.exists(grace_path), "Grace file should have been written"
+    finally:
+        os.environ.pop("OMNIPIPE_LICENSE_SERVER", None)
+        if os.path.exists(grace_path):
+            os.remove(grace_path)
+
+run_test(
+    "Lic-Server",
+    "phone_home() falls back to grace period when server unreachable",
+    test_phone_home_unreachable_triggers_grace,
+)
+
+
+def test_grace_period_expired_blocks():
+    """
+    A grace file older than GRACE_PERIOD_DAYS should cause phone_home() to return False.
+    """
+    import json
+    grace_path = os.path.expanduser("~/.omnipipe_grace")
+    old_date = (datetime.date.today() - datetime.timedelta(days=10)).isoformat()
+
+    with open(grace_path, "w") as f:
+        json.dump({"grace_start": old_date, "studio": "QA Studio"}, f)
+
+    try:
+        from omnipipe.core import license as lic_mod
+        lic_mod._LICENSE_SERVER_URL = "http://127.0.0.1:19999"
+        valid, msg = lic_mod.phone_home(
+            studio_id="test-000", studio_name="QA Studio", dcc="nuke"
+        )
+        assert valid is False, f"Expired grace should block, but got valid=True: {msg}"
+        assert "GRACE PERIOD EXPIRED" in msg or "EXPIRED" in msg.upper()
+    finally:
+        if os.path.exists(grace_path):
+            os.remove(grace_path)
+
+run_test(
+    "Lic-Server",
+    "phone_home() blocks when grace period has expired (>7 days offline)",
+    test_grace_period_expired_blocks,
+)
 
 # -----------------------------------------------------------------------
 # SUMMARY

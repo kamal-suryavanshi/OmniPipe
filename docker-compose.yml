@@ -1,0 +1,118 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  OmniPipe Docker Compose — Full Studio Stack
+#  Person C: this is the master compose for the studio server
+#
+#  Services:
+#    omnipipe-license  — License validation API (Layer 2 DRM)
+#    omnipipe-api      — Pipeline REST API (context, publish, metadata)
+#    kitsu             — Asset management UI
+#    postgres          — Shared database for Kitsu + license server
+#
+#  Usage:
+#    docker compose up -d                  # start all services
+#    docker compose up omnipipe-license    # start license server only
+#    docker compose logs -f omnipipe-license
+#    docker compose down                   # stop all (does NOT delete data)
+#    docker compose down -v                # stop + wipe volumes (DESTRUCTIVE)
+# ─────────────────────────────────────────────────────────────────────────────
+
+networks:
+  omnipipe-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  nas-projects:
+    driver: local
+    driver_opts:
+      type: nfs           # Person C: change to smb or bind for local NAS
+      o: "addr=${NAS_HOST},ro"
+      device: ":${NAS_SHARE_PATH}"
+
+services:
+
+  # ── License Server ────────────────────────────────────────────────────────
+  omnipipe-license:
+    build:
+      context: ./license_server
+      dockerfile: Dockerfile
+    container_name: omnipipe-license
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      OMNIPIPE_SECRET_KEY: ${OMNIPIPE_SECRET_KEY}
+      OMNIPIPE_ADMIN_KEY:  ${OMNIPIPE_ADMIN_KEY}
+      # Person C TODO: add DB connection string when switching to Postgres
+      # DATABASE_URL: postgresql+asyncpg://omnipipe:${POSTGRES_PASSWORD}@postgres:5432/licenses
+    networks:
+      - omnipipe-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8090/health')"]
+      interval: 30s
+      timeout:  5s
+      retries:  3
+
+  # ── Pipeline API (Person C: build this) ──────────────────────────────────
+  omnipipe-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api       # Person C: create this
+    container_name: omnipipe-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      OMNIPIPE_SECRET_KEY: ${OMNIPIPE_SECRET_KEY}
+      STUDIO_ROOT:         /mnt/nas/projects
+      LICENSE_SERVER_URL:  http://omnipipe-license:8090
+    volumes:
+      - nas-projects:/mnt/nas/projects:ro     # read-only — artists write via DCC
+    networks:
+      - omnipipe-net
+    depends_on:
+      omnipipe-license:
+        condition: service_healthy
+
+  # ── Kitsu (official image) ────────────────────────────────────────────────
+  kitsu:
+    image: cgwire/kitsu:latest
+    container_name: omnipipe-kitsu
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      DB_USERNAME: omnipipe
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST:     postgres
+      DB_PORT:     5432
+      DB_NAME:     kitsu
+      SECRET_KEY:  ${KITSU_SECRET_KEY}
+    networks:
+      - omnipipe-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Postgres ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: omnipipe-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER:     omnipipe
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       kitsu
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - omnipipe-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U omnipipe"]
+      interval: 10s
+      timeout:  5s
+      retries:  5

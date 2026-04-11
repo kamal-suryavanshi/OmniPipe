@@ -1,5 +1,8 @@
-# Environments
+# Environments & secrets — NEVER commit
 .env
+.env.*
+!.env.example
+.omnipipe_grace
 .venv
 env/
 venv/

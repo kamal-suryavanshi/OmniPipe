@@ -245,3 +245,5 @@ All Person A production gaps have been implemented. The remaining work belongs t
 | `ModuleNotFoundError: gazu` | Kitsu server not running | Expected — `omnipipe login` requires a live Kitsu instance |
 | Folders created but empty | Init ran in `--dry-run` accidentally | Re-run without `--dry-run` |
 | `.omnipipe_stamp` blocks re-run | Previous install detected | Use `--force` flag if intentional |
+ 
+ 
