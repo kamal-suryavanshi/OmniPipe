@@ -16,6 +16,7 @@ This section documents all production-ready tools in OmniPipe. Each tool address
 | [`omnipipe.sh` / `omnipipe.bat`](#gap-6-os-launchers) | Launcher | Double-click or alias CLI entry point |
 | [`omnipipe publish`](#omnipipe-publish) | CLI | Publish files through full pipeline lifecycle |
 | [`omnipipe load-latest`](#omnipipe-load-latest) | CLI | Resolve latest published version per shot/task |
+| [`install_maya_hook.py`](#maya-startup-hook) | Script | Installs OmniPipe shelf into Maya |
 
 ---
 
@@ -446,3 +447,61 @@ omnipipe load-latest PROJ sq001 sh0010 comp --dcc nuke
   📦  Latest publish: hero_anim_v008.ma  (v008)
   Full path: /tmp/studio/PROJ/sequences/sq001/sh0010/publish/maya/anim/hero_anim_v008.ma
 ```
+
+---
+
+## Maya Startup Hook
+
+**Files:**
+- `omnipipe/dcc/maya/startup.py` — startup logic (license check + shelf)
+- `omnipipe/dcc/maya/userSetup.py` — Maya bootstrap file
+- `scripts/install_maya_hook.py` — installer script
+
+### What happens when Maya starts
+
+```
+Maya boots → executes userSetup.py
+  → cmds.evalDeferred() waits for full UI load
+  → omnipipe.dcc.maya.startup.bootstrap() runs:
+      1. Injects repo root + vendor into sys.path
+      2. Validates license (Layer 1: local .lic)
+      3. Phone-home heartbeat (Layer 2: server)
+      4. If valid → creates OmniPipe shelf (4 buttons)
+      5. If invalid → shows warning dialog, shelf disabled
+```
+
+### OmniPipe shelf buttons
+
+| Button | What it does |
+|---|---|
+| **OP Save** | License-gated `cmds.file(save=True)` |
+| **OP Publish** | Runs `MayaDCC.publish()` → copies to publish path |
+| **OP Load** | Prompts for shot context → references latest publish |
+| **OP Doctor** | Runs `omnipipe doctor` in Script Editor |
+
+### Installing the hook
+
+```bash
+# Default: install into Maya 2025
+python3 scripts/install_maya_hook.py
+
+# Specific Maya version
+python3 scripts/install_maya_hook.py --maya-version 2024
+
+# Custom scripts directory
+python3 scripts/install_maya_hook.py --maya-dir /custom/maya/scripts
+```
+
+### Maya scripts directory by platform
+
+| Platform | Path |
+|---|---|
+| macOS | `~/Library/Preferences/Autodesk/maya/{version}/scripts/` |
+| Windows | `~/Documents/maya/{version}/scripts/` |
+| Linux | `~/maya/{version}/scripts/` |
+
+### What the installer does
+
+1. Copies `userSetup.py` into Maya's scripts directory
+2. Backs up any existing `userSetup.py` as `.py.bak_omnipipe`
+3. Writes `OMNIPIPE_REPO_ROOT` into `Maya.env` so startup.py can find the repo

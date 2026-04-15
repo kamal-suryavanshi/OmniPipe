@@ -365,6 +365,23 @@ def test_b2_load_latest_picks_highest():
 
 run_test("B2", "load-latest: get_latest_version picks v005 from [v001,v002,v003,v005]", test_b2_load_latest_picks_highest)
 
+
+# -----------------------------------------------------------------------
+# B3: MAYA STARTUP HOOK — module importable + functions exist
+# -----------------------------------------------------------------------
+def test_b3_maya_startup_importable():
+    """
+    Verify the Maya startup module can be imported outside Maya (headless)
+    and that all expected entry points exist.
+    """
+    from omnipipe.dcc.maya import startup
+    assert hasattr(startup, "bootstrap"), "Missing bootstrap() entry point"
+    assert hasattr(startup, "_validate_license"), "Missing _validate_license()"
+    assert hasattr(startup, "_create_shelf"), "Missing _create_shelf()"
+    assert hasattr(startup, "_inject_omnipipe_path"), "Missing _inject_omnipipe_path()"
+
+run_test("B3", "Maya startup module importable with bootstrap/_validate_license/_create_shelf", test_b3_maya_startup_importable)
+
 # -----------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------
