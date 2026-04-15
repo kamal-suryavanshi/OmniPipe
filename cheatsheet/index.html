@@ -58,6 +58,14 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#4-test-dcc">4. test-dcc</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-publish">5. publish</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-load-latest">6. load-latest</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-create-shot">7. create-shot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-doctor">8. doctor</a>
+    </li>
         </ul>
     </li>
     </ul>
@@ -167,8 +175,56 @@
   python -m omnipipe test-dcc nuke</code>
   <em>(Expected Output: Simulated secure save and publish dummy terminal outputs)</em></li>
 </ul>
+<h3 id="5-publish">5. <code>publish</code></h3>
+<ul>
+<li><strong>Who:</strong> Artists, TDs</li>
+<li><strong>Description:</strong> Publishes a source file through the full OmniPipe pipeline — validates license, runs validators &amp; extractors, tracks dependencies, writes metadata JSON.</li>
+<li><strong>Valid Examples:</strong>
+  ```bash
+  # Publish a Maya animation file with full tracking
+  python -m omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+    --project PROJ --sequence sq001 --shot sh0010 --task anim --dcc maya --track-deps</li>
+</ul>
+<p># Dry-run (validate only, no files written)
+  python -m omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+    --project PROJ --sequence sq001 --shot sh0010 --task anim --dry-run</p>
+<p># Explicit version override
+  python -m omnipipe publish ./char_rig.ma \
+    --project PROJ -sq sq001 -sh sh0010 -t rig --version v005
+  <code>``
+  *(Auto-detects version from filename if</code>--version` is omitted)*</p>
+<h3 id="6-load-latest">6. <code>load-latest</code></h3>
+<ul>
+<li><strong>Who:</strong> Artists, TDs, DCC Loaders</li>
+<li><strong>Description:</strong> Scans the publish directory for a given shot/task/DCC and prints the path to the latest versioned file. Used by Nuke/Maya loaders to resolve references.</li>
+<li><strong>Valid Examples:</strong>
+  ```bash
+  # Find latest Maya anim publish
+  python -m omnipipe load-latest PROJ sq001 sh0010 anim --dcc maya</li>
+</ul>
+<p># Find latest Nuke comp publish
+  python -m omnipipe load-latest PROJ sq001 sh0010 comp --dcc nuke
+  <code>``
+  *(Prints:</code>📦 Latest publish: hero_anim_v008.ma (v008)` + full path)*</p>
+<h3 id="7-create-shot">7. <code>create-shot</code></h3>
+<ul>
+<li><strong>Who:</strong> Production Coordinators, TDs</li>
+<li><strong>Description:</strong> Creates a new shot's full folder tree (work/publish/render/cache) without re-running init_studio.</li>
+<li><strong>Valid Example:</strong>
+  <code>bash
+  python -m omnipipe create-shot /mnt/nas PROJ sq003 sh0050
+  python -m omnipipe create-shot /mnt/nas PROJ sq003 sh0050 --dry-run  # preview only</code></li>
+</ul>
+<h3 id="8-doctor">8. <code>doctor</code></h3>
+<ul>
+<li><strong>Who:</strong> TDs, System Admins</li>
+<li><strong>Description:</strong> Runs a full post-deploy health check — Python version, imports, license, NAS mount, schema, studio stamp.</li>
+<li><strong>Valid Example:</strong>
+  <code>bash
+  python -m omnipipe doctor --studio-root /mnt/nas --project PROJ</code></li>
+</ul>
 <hr />
-<p><em>Note: More features (Publishing, Workfile Manager) will be added here as Day 5+ progresses!</em></p>
+<p><em>See <code>docs/setup/pipeline_tools.md</code> for the complete reference with all flags.</em></p>
               
             </div>
           </div><footer>

@@ -139,6 +139,36 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#omnipipe-publish">omnipipe publish</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#usage_2">Usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#arguments_1">Arguments</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#options_2">Options</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_2">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pipeline-phases">Pipeline Phases</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#omnipipe-load-latest">omnipipe load-latest</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#usage_3">Usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#arguments_2">Arguments</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#options_3">Options</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dcc-extension-map">DCC Extension Map</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_3">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#expected-output_1">Expected Output</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../license_server/">License Server (Person C)</a>
@@ -190,7 +220,7 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="pipeline-tools-reference">Pipeline Tools Reference</h1>
-<p>This section documents all six production-gap tools added to OmniPipe after the core 10-task roadmap. Each tool addresses a real-world deployment scenario.</p>
+<p>This section documents all production-ready tools in OmniPipe. Each tool addresses a real-world deployment or artist workflow scenario.</p>
 <hr />
 <h2 id="tool-index">Tool Index</h2>
 <table>
@@ -231,6 +261,16 @@
 <td><a href="#gap-6-os-launchers"><code>omnipipe.sh</code> / <code>omnipipe.bat</code></a></td>
 <td>Launcher</td>
 <td>Double-click or alias CLI entry point</td>
+</tr>
+<tr>
+<td><a href="#omnipipe-publish"><code>omnipipe publish</code></a></td>
+<td>CLI</td>
+<td>Publish files through full pipeline lifecycle</td>
+</tr>
+<tr>
+<td><a href="#omnipipe-load-latest"><code>omnipipe load-latest</code></a></td>
+<td>CLI</td>
+<td>Resolve latest published version per shot/task</td>
 </tr>
 </tbody>
 </table>
@@ -598,6 +638,237 @@ omnipipe doctor
 <p>Both launchers display a command reference menu when run with no args:</p>
 <pre><code class="language-bash">./omnipipe.sh
 # → shows all available commands + admin script references
+</code></pre>
+<hr />
+<h2 id="omnipipe-publish"><code>omnipipe publish</code></h2>
+<p><strong>Command:</strong> <code>omnipipe publish</code></p>
+<p>Publishes a source file through the complete pipeline lifecycle: <strong>License → Validators → Extractors → Dependency Tracking → Metadata JSON</strong>.</p>
+<h3 id="usage_2">Usage</h3>
+<pre><code class="language-bash">omnipipe publish SOURCE [OPTIONS]
+</code></pre>
+<h3 id="arguments_1">Arguments</h3>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SOURCE</code></td>
+<td>Path to the source file to publish</td>
+<td><code>/mnt/nas/PROJ/work/maya/anim/hero_v003.ma</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="options_2">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Short</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--project</code></td>
+<td><code>-p</code></td>
+<td><em>required</em></td>
+<td>Project code</td>
+</tr>
+<tr>
+<td><code>--sequence</code></td>
+<td><code>-sq</code></td>
+<td><em>required</em></td>
+<td>Sequence name</td>
+</tr>
+<tr>
+<td><code>--shot</code></td>
+<td><code>-sh</code></td>
+<td><em>required</em></td>
+<td>Shot name</td>
+</tr>
+<tr>
+<td><code>--task</code></td>
+<td><code>-t</code></td>
+<td><em>required</em></td>
+<td>Task name</td>
+</tr>
+<tr>
+<td><code>--dcc</code></td>
+<td><code>-d</code></td>
+<td><code>maya</code></td>
+<td>DCC name (<code>maya</code>, <code>nuke</code>, <code>silhouette</code>)</td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td><code>-v</code></td>
+<td><em>auto-detected</em></td>
+<td>Version string (reads from filename if omitted)</td>
+</tr>
+<tr>
+<td><code>--track-deps</code></td>
+<td></td>
+<td><code>False</code></td>
+<td>Enable upstream dependency scanning</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td></td>
+<td><code>False</code></td>
+<td>Validate only — no files written</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_2">Examples</h3>
+<pre><code class="language-bash"># Publish with dependency tracking
+omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+  --project PROJ --sequence sq001 --shot sh0010 --task anim --track-deps
+
+# Dry-run: validates everything but writes nothing
+omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+  --project PROJ --sequence sq001 --shot sh0010 --task anim --dry-run
+
+# Override auto-detected version
+omnipipe publish ./char_rig.ma \
+  -p PROJ -sq sq001 -sh sh0010 -t rig --version v005
+</code></pre>
+<h3 id="pipeline-phases">Pipeline Phases</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>License</td>
+<td>Validates <code>~/omnipipe.lic</code> (blocks whole pipeline if invalid)</td>
+</tr>
+<tr>
+<td>Validators</td>
+<td>FileExists, NamingConvention checks</td>
+</tr>
+<tr>
+<td>Extractors</td>
+<td>EXR sequence, Playblast generation</td>
+</tr>
+<tr>
+<td>Dependencies</td>
+<td>Scans Maya/Nuke ASCII for <code>file -r</code> references (if <code>--track-deps</code>)</td>
+</tr>
+<tr>
+<td>Metadata</td>
+<td>Writes <code>{name}.json</code> sidecar with user, timestamp, source path, dependencies</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="omnipipe-load-latest"><code>omnipipe load-latest</code></h2>
+<p><strong>Command:</strong> <code>omnipipe load-latest</code></p>
+<p>Scans the publish directory for a given shot/task/DCC and returns the path to the <strong>highest versioned</strong> file. Used by Nuke/Maya loaders to resolve references.</p>
+<h3 id="usage_3">Usage</h3>
+<pre><code class="language-bash">omnipipe load-latest PROJECT SEQUENCE SHOT TASK [OPTIONS]
+</code></pre>
+<h3 id="arguments_2">Arguments</h3>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PROJECT</code></td>
+<td>Project code</td>
+<td><code>ACME_PROJ</code></td>
+</tr>
+<tr>
+<td><code>SEQUENCE</code></td>
+<td>Sequence name</td>
+<td><code>sq001</code></td>
+</tr>
+<tr>
+<td><code>SHOT</code></td>
+<td>Shot name</td>
+<td><code>sh0010</code></td>
+</tr>
+<tr>
+<td><code>TASK</code></td>
+<td>Task name</td>
+<td><code>anim</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="options_3">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Short</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--dcc</code></td>
+<td><code>-d</code></td>
+<td><code>maya</code></td>
+<td>DCC to filter by (determines file extension)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dcc-extension-map">DCC Extension Map</h3>
+<table>
+<thead>
+<tr>
+<th>DCC</th>
+<th>Extension scanned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maya</code></td>
+<td><code>.ma</code></td>
+</tr>
+<tr>
+<td><code>nuke</code></td>
+<td><code>.nk</code></td>
+</tr>
+<tr>
+<td><code>houdini</code></td>
+<td><code>.hip</code></td>
+</tr>
+<tr>
+<td><code>blender</code></td>
+<td><code>.blend</code></td>
+</tr>
+<tr>
+<td><code>silhouette</code></td>
+<td><code>.sfx</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_3">Examples</h3>
+<pre><code class="language-bash"># Latest Maya animation publish
+omnipipe load-latest PROJ sq001 sh0010 anim --dcc maya
+
+# Latest Nuke comp publish
+omnipipe load-latest PROJ sq001 sh0010 comp --dcc nuke
+</code></pre>
+<h3 id="expected-output_1">Expected Output</h3>
+<pre><code>  Publish dir: /tmp/studio/PROJ/sequences/sq001/sh0010/publish/maya/anim
+
+  📦  Latest publish: hero_anim_v008.ma  (v008)
+  Full path: /tmp/studio/PROJ/sequences/sq001/sh0010/publish/maya/anim/hero_anim_v008.ma
 </code></pre>
               
             </div>
