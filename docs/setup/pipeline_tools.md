@@ -555,3 +555,30 @@ python3 scripts/install_nuke_hook.py --nuke-dir /studio/nuke/plugins
 All platforms use `~/.nuke/` by default. The installer writes:
 - `menu.py` — the OmniPipe bootstrap
 - `init.py` — sets `OMNIPIPE_REPO_ROOT` environment variable
+
+---
+
+## Silhouette Startup Hook
+
+**Files:**
+- `omnipipe/dcc/silhouette/startup.py` — startup logic (license check + hook registry)
+
+### What happens when Silhouette starts
+
+```
+Silhouette boots → invokes predefined scripts or user runs it
+  → omnipipe.dcc.silhouette.startup.bootstrap() runs:
+      1. Injects repo root + vendor into sys.path
+      2. Validates license (Layer 1 + Layer 2)
+      3. If valid → Adds OmniPipe menu to fx.menu() or binds to fx.bind()
+      4. If invalid → Locks menu actions + shows license error
+```
+
+### OmniPipe menu/action hooks
+
+| Action | What it does |
+|---|---|
+| **Save** | License-gated `fx.activeProject().save()` |
+| **Save Version Up** | Auto `_v003` → `_v004` bump & save |
+| **Publish** | Copies to publish path + metadata sidecar |
+| **Export Shapes (Nuke)** | Exports Silhouette shapes to Nuke `.nk` format |
