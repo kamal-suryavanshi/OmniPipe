@@ -42,55 +42,30 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Home</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#quick-start-for-developers-person-b-c">Quick Start for Developers (Person B &amp; C)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#the-guides">🧭 The Guides</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-technical-director-td-guide">1. Technical Director (TD) Guide</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-qa-tester-guide">2. QA &amp; Tester Guide</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-developer-guide">3. Developer Guide</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-artist-guide">4. Artist Guide</a>
+    </li>
+        </ul>
     </li>
     </ul>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Guides</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="cheatsheet/">CLI Cheatsheet (Usage)</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="test_plan/">Master Test Plan</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="qa_testing_guide/">QA Testing Guide (For Non-Techies)</a>
-                </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Studio Setup & Onboarding</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="setup/studio_setup_guide/">▶ Studio Setup Guide (Start Here)</a>
+                  <li class="toctree-l1"><a class="reference internal" href="guides/td_guide/">1. Technical Director (TD) Guide</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="setup/onboarding/">Onboarding Guide</a>
+                  <li class="toctree-l1"><a class="reference internal" href="guides/testing_guide/">2. QA & Tester Guide</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="setup/intake_form_reference/">Intake Form Reference</a>
+                  <li class="toctree-l1"><a class="reference internal" href="guides/developer_guide/">3. Pipeline Developer Guide</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="setup/pipeline_tools/">Pipeline Tools Reference</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="setup/license_server/">License Server (Person C)</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Architecture Walkthroughs</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_1_2/">Task 1 & 2 (Repo & Context)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_3/">Task 3 (Path Manager)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_4/">Task 4 (Publish Design)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_5/">Task 5 (Validators)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_6/">Task 6 (Extractors)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_7/">Task 7 (Metadata)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_8/">Task 8 (Dependency Tracking)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_9/">Task 9 (License System)</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="walkthroughs/task_10/">Task 10 (Error Handling)</a>
+                  <li class="toctree-l1"><a class="reference internal" href="guides/artist_guide/">4. Artist Usage Guide</a>
                   </li>
               </ul>
       </div>
@@ -116,27 +91,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="welcome-to-omnipipe">Welcome to OmniPipe</h1>
-<p><strong>OmniPipe</strong> is a generic, production-ready CG Studio Pipeline core designed to operate seamlessly across distributed, multi-site teams. </p>
-<p>It uses a fully decoupled architecture powered by Python and a custom Context System, allowing TDs and Developers to integrate DCC tools (Maya, Nuke, Blender) frictionlessly.</p>
-<h2 id="quick-start-for-developers-person-b-c">Quick Start for Developers (Person B &amp; C)</h2>
-<p>OmniPipe uses a <strong>Vendorized Architecture</strong>. This means 100% of the dependencies (like the CLI framework and Kitsu API) are pre-packaged in the <code>omnipipe/vendor/</code> folder. </p>
-<p>There are zero installations required.</p>
-<ol>
-<li>Clone the repository:
-   <code>bash
-   git clone https://github.com/kamal-suryavanshi/OmniPipe.git
-   cd OmniPipe</code></li>
-<li>Test the setup instantly using standard Python:
-   <code>bash
-   python -m omnipipe --help</code></li>
-</ol>
-<p>To explore the pipeline further, check out the <strong><a href="cheatsheet/">CLI Cheatsheet</a></strong>.</p>
+                <h1 id="omnipipe-documentation">OmniPipe Documentation</h1>
+<p>Welcome to the official documentation for <strong>OmniPipe</strong>, a dynamic, zero-install VFX Studio Pipeline.</p>
+<p>To keep things perfectly simple, we have divided the documentation into four strict modules based on your role in the studio. Please select the guide that applies to you:</p>
+<h2 id="the-guides">🧭 The Guides</h2>
+<h3 id="1-technical-director-td-guide"><a href="guides/td_guide/">1. Technical Director (TD) Guide</a></h3>
+<p><em>For Pipeline TDs and System Administrators.</em>
+Contains the explicit, step-by-step instructions for initializing the central NAS, configuring the schema dictionaries, and deploying the workstation bundles to your studio.</p>
+<h3 id="2-qa-tester-guide"><a href="guides/testing_guide/">2. QA &amp; Tester Guide</a></h3>
+<p><em>For QA Testers, Coordinators, and Pre-Release Checkers.</em>
+Contains the step-by-step methodology to check NAS permissions, run the <code>omnipipe doctor</code> diagnostic, and do end-to-end publish tests in Maya and Nuke before studio deployment.</p>
+<h3 id="3-developer-guide"><a href="guides/developer_guide/">3. Developer Guide</a></h3>
+<p><em>For Python Developers.</em>
+A holistic, technical breakdown of the OmniPipe Engine. Learn how the <code>PipelineContext</code> maps against the <code>configs/schema.yaml</code>, how to write custom native Validators, and how to subclass the <code>DCCInterface</code> to bind new software like Blender or Houdini.</p>
+<h3 id="4-artist-guide"><a href="guides/artist_guide/">4. Artist Guide</a></h3>
+<p><em>For the 3D Artists, Animators, and Compositors.</em>
+A completely jargon-free, simple manual explaining how to click the "OP Save", "OP Publish", and "Load" buttons inside of your creative apps.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="cheatsheet/" class="btn btn-neutral float-right" title="CLI Cheatsheet (Usage)">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="guides/td_guide/" class="btn btn-neutral float-right" title="1. Technical Director (TD) Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -160,7 +135,7 @@
     
     
     
-      <span><a href="cheatsheet/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="guides/td_guide/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
@@ -180,5 +155,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-04-15 17:46:55.233940+00:00
+Build Date UTC : 2026-04-15 18:04:49.109037+00:00
 -->

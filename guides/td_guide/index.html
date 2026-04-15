@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://kamal-suryavanshi.github.io/OmniPipe/guides/td_guide/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>1. Technical Director (TD) Guide - OmniPipe Documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1. Technical Director (TD) Guide";
+        var mkdocs_page_input_path = "guides/td_guide.md";
+        var mkdocs_page_url = "/OmniPipe/guides/td_guide/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> OmniPipe Documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">1. Technical Director (TD) Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">📋 Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-1-initializing-the-studio-root">Step 1: Initializing the Studio Root</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-2-configuring-the-schema">Step 2: Configuring the Schema</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-3-setting-up-dependencies">Step 3: Setting Up Dependencies</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-4-workstation-deployment">Step 4: Workstation Deployment</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-5-license-server-optional">Step 5: License Server (Optional)</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../testing_guide/">2. QA & Tester Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../developer_guide/">3. Pipeline Developer Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../artist_guide/">4. Artist Usage Guide</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">OmniPipe Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Guides</li>
+      <li class="breadcrumb-item active">1. Technical Director (TD) Guide</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="technical-director-td-guide">Technical Director (TD) Guide</h1>
+<p>Welcome! This guide is explicitly for Technical Directors (TDs), Systems Administrators, or Pipeline Engineers tasked with deploying OmniPipe across a studio network.</p>
+<h2 id="prerequisites">📋 Prerequisites</h2>
+<p>Before equipping the studio, ensure you have:
+- <strong>Central Storage:</strong> A network-attached storage (NAS) or central file server mapped to a common letter/path across all artist machines (e.g., <code>Z:\</code> or <code>/mnt/projects</code>).
+- <strong>Python 3.10+:</strong> Installed on your admin machine.
+- <strong>Admin Access:</strong> To deploy license keys and workstation install scripts over the network.
+- <strong>Docker:</strong> (Optional but recommended) For running the central License Server.</p>
+<hr />
+<h2 id="step-1-initializing-the-studio-root">Step 1: Initializing the Studio Root</h2>
+<p>OmniPipe requires a dedicated "Projects" folder on your NAS.
+1. Run the initialization script to stamp the directory:</p>
+<pre><code class="language-bash">python scripts/init_studio.py --root /mnt/projects --project DEMO \
+  --fps 24 --resolution 1920x1080 
+</code></pre>
+<p><em>This creates the hidden <code>.omnipipe_stamp</code> file validating the NAS drive.</em></p>
+<h2 id="step-2-configuring-the-schema">Step 2: Configuring the Schema</h2>
+<p>The <code>schema.yaml</code> file controls exactly where artist files are saved.
+1. Open <code>configs/schema.yaml</code>
+2. Adjust your mount templates:</p>
+<pre><code class="language-yaml">mounts:
+  nas_root: 
+    windows: 'Z:\Projects'
+    mac: '/Volumes/Projects'
+    linux: '/mnt/projects'
+</code></pre>
+<ol>
+<li>Customize your standard folder naming conventions under <code>directories</code>.</li>
+</ol>
+<h2 id="step-3-setting-up-dependencies">Step 3: Setting Up Dependencies</h2>
+<p>OmniPipe is zero-install for artists, meaning all their modules load directly from the NAS!
+1. Build the network dependency bundle:</p>
+<pre><code class="language-bash">python scripts/build_vendor.py
+</code></pre>
+<p><em>This downloads libraries like <code>typer</code>, <code>gazu</code>, and <code>rich</code> into the <code>vendor/</code> folder, which is pushed to the pipeline root. Artists won't need to run <code>pip install</code>!</em></p>
+<h2 id="step-4-workstation-deployment">Step 4: Workstation Deployment</h2>
+<p>To attach artists to the pipeline:
+1. Provide artists with the <code>install_workstation.py</code> script.
+2. Share the secret <code>omnipipe.lic</code> file and have them place it in their home directory.
+3. They will run the script, which automatically injects the hooks into Maya, Nuke, and Silhouette.</p>
+<h2 id="step-5-license-server-optional">Step 5: License Server (Optional)</h2>
+<p>If utilizing Layer 3 tracking:
+1. Copy the <code>license_server/</code> folder to a secure Docker host.
+2. Run <code>docker-compose up -d</code>.
+3. Distribute the host IP to <code>configs/license.ini</code> so artists phone-home to your server.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../.." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../testing_guide/" class="btn btn-neutral float-right" title="2. QA & Tester Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../.." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../testing_guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

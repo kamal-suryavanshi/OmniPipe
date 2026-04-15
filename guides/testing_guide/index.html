@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://kamal-suryavanshi.github.io/OmniPipe/guides/testing_guide/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>2. QA & Tester Guide - OmniPipe Documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "2. QA \u0026 Tester Guide";
+        var mkdocs_page_input_path = "guides/testing_guide.md";
+        var mkdocs_page_url = "/OmniPipe/guides/testing_guide/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> OmniPipe Documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../td_guide/">1. Technical Director (TD) Guide</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">2. QA & Tester Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">📋 Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-1-health-diagnostic">Step 1: Health Diagnostic</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-2-testing-maya-integrations">Step 2: Testing Maya Integrations</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-3-testing-nuke-integrations">Step 3: Testing Nuke Integrations</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-4-command-line-tests-advanced-qa">Step 4: Command Line Tests (Advanced QA)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reporting-bugs">📝 Reporting Bugs</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../developer_guide/">3. Pipeline Developer Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../artist_guide/">4. Artist Usage Guide</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">OmniPipe Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Guides</li>
+      <li class="breadcrumb-item active">2. QA & Tester Guide</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="qa-tester-guide">QA &amp; Tester Guide</h1>
+<p>Welcome! This guide is written for Quality Assurance (QA) testers, Production Coordinators, or Artists who need to test the pipeline <em>before</em> it rolls out to production. </p>
+<p>You don't need to be a programmer to follow this guide. We will walk you through exactly what you need, how to install it, and what buttons to click.</p>
+<hr />
+<h2 id="prerequisites">📋 Prerequisites</h2>
+<p>Before you start testing OmniPipe, please ensure your computer has:
+1. <strong>Python 3.10+</strong>: Run <code>python --version</code> in your terminal to check. (Download from python.org if missing).
+2. <strong>At least one DCC</strong>: Maya (2022+), Nuke (13+), or Silhouette installed.
+3. <strong>The License Key</strong>: Place the <code>omnipipe.lic</code> file provided by your TD into your secure Home Directory (<code>~</code>).
+4. <strong>Access to the NAS</strong>: You must be connected to the Studio NAS or Network Drive so you can reach the pipeline root.</p>
+<hr />
+<h2 id="step-1-health-diagnostic">Step 1: Health Diagnostic</h2>
+<p>Before testing the creative apps, let's run the automated "Doctor" to double-check your computer's health.</p>
+<ol>
+<li>Open your Terminal/Command Prompt.</li>
+<li>Navigate to your local copy of StudioPipeline and type:</li>
+</ol>
+<pre><code class="language-bash"># Mac / Linux
+./omnipipe.sh doctor
+
+# Windows
+omnipipe.bat doctor
+</code></pre>
+<ol>
+<li>A visual table will appear. Ensure that every item in the <code>Status</code> column has a green ✅. If you see a red ❌, report the error message to your TD!</li>
+</ol>
+<hr />
+<h2 id="step-2-testing-maya-integrations">Step 2: Testing Maya Integrations</h2>
+<ol>
+<li>Run the local installer script on your terminal: <code>python scripts/install_maya_hook.py</code></li>
+<li><strong>Open Maya.</strong></li>
+<li>Look at your toolbars near the top. You should see a brand new shelf tab called <strong>OmniPipe</strong>.</li>
+<li>Create a simple sphere in the scene.</li>
+<li>Click the <strong>OP Save</strong> button on the shelf. Because this is the first save, Maya will ask you where to put it. </li>
+<li>Move the sphere slightly.</li>
+<li>Click the <strong>OP Publish</strong> button. </li>
+<li><strong>Verification:</strong> A pop-up confirming that your file was automatically placed into the correct Pipeline Publish folder, and versioned up (e.g. <code>_v002</code>).</li>
+</ol>
+<hr />
+<h2 id="step-3-testing-nuke-integrations">Step 3: Testing Nuke Integrations</h2>
+<ol>
+<li>Run the installer: <code>python scripts/install_nuke_hook.py</code></li>
+<li><strong>Open Nuke.</strong></li>
+<li>In the top menu bar, look for the new <strong>OmniPipe</strong> dropdown.</li>
+<li>Add a <code>ColorBars</code> node.</li>
+<li>Click <strong>OmniPipe &gt; Save Version Up</strong> (or use <code>Ctrl+Shift+S</code>).</li>
+<li><strong>Verification:</strong> The script will automatically save and bump its version number.</li>
+<li>Click <strong>OmniPipe &gt; Publish</strong>.</li>
+<li><strong>Verification:</strong> It will take a snapshot and push it to the central server publish directory safely!</li>
+</ol>
+<hr />
+<h2 id="step-4-command-line-tests-advanced-qa">Step 4: Command Line Tests (Advanced QA)</h2>
+<p>If you need to test the pipeline engine forcefully without opening DCC software:
+1. Try publishing a dummy file from the terminal:</p>
+<pre><code class="language-bash">python -m omnipipe publish /path/to/test.ma --project DEMO --sequence sq01 --shot sh01 --task anim --dcc maya
+</code></pre>
+<ol>
+<li>Verify you see the green <code>🎉 Published successfully!</code> message and a dynamic progress bar.</li>
+</ol>
+<hr />
+<h2 id="reporting-bugs">📝 Reporting Bugs</h2>
+<p>If an app crashes or a button doesn't work, simply navigate to your local log folder (<code>~/omnipipe/logs/</code>). Grab the text files inside and send them to your Technical Director. They contain all the hidden stack trace data needed to fix the bug!</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../td_guide/" class="btn btn-neutral float-left" title="1. Technical Director (TD) Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../developer_guide/" class="btn btn-neutral float-right" title="3. Pipeline Developer Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../td_guide/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../developer_guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

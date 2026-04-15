@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://kamal-suryavanshi.github.io/OmniPipe/guides/developer_guide/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>3. Pipeline Developer Guide - OmniPipe Documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "3. Pipeline Developer Guide";
+        var mkdocs_page_input_path = "guides/developer_guide.md";
+        var mkdocs_page_url = "/OmniPipe/guides/developer_guide/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> OmniPipe Documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../td_guide/">1. Technical Director (TD) Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../testing_guide/">2. QA & Tester Guide</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">3. Pipeline Developer Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">📋 Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-the-context-system">1. The Context System</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-the-path-resolver-engine">2. The Path Resolver Engine</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-the-publish-engine">3. The Publish Engine</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#phase-1-validators">Phase 1: Validators</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#phase-2-extractors">Phase 2: Extractors</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-integrating-a-new-dcc">4. Integrating a New DCC</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../artist_guide/">4. Artist Usage Guide</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">OmniPipe Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Guides</li>
+      <li class="breadcrumb-item active">3. Pipeline Developer Guide</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="pipeline-developer-guide">Pipeline Developer Guide</h1>
+<p>Welcome. This document maps out the core architecture of OmniPipe for Python developers. OmniPipe is built entirely on generic, abstract Object-Oriented patterns to ensure high extensibility.</p>
+<h2 id="prerequisites">📋 Prerequisites</h2>
+<p>To develop and compile OmniPipe, you will need:
+- Python 3.10+
+- Familiarity with Object-Oriented Python (<code>dataclasses</code>, <code>abc.ABC</code>, <code>typing</code>).
+- An understanding of the <code>configs/schema.yaml</code> definition file.</p>
+<hr />
+<h2 id="1-the-context-system">1. The Context System</h2>
+<p>The backbone of OmniPipe is the <code>PipelineContext</code> dataclass located in <code>omnipipe/core/context.py</code>. Every action passed to the pipeline must first resolve into a Context.</p>
+<pre><code class="language-python">from omnipipe.core.context import PipelineContext
+
+ctx = PipelineContext(
+    project=&quot;DEMO&quot;,
+    sequence=&quot;sq010&quot;,
+    shot=&quot;sh0100&quot;,
+    task=&quot;anim&quot;,
+    version=&quot;003&quot;,
+    dcc=&quot;maya&quot;
+)
+</code></pre>
+<h2 id="2-the-path-resolver-engine">2. The Path Resolver Engine</h2>
+<p>Instead of hardcoding save paths inside pipeline scripts, the <code>PathResolver</code> dynamically generates physical absolute paths based on the <code>configs/schema.yaml</code> template.</p>
+<pre><code class="language-python">from omnipipe.core.context import PathResolver
+
+resolver = PathResolver()
+final_path = resolver.resolve(&quot;publish_file_maya&quot;, ctx)
+# Output Example: /mnt/projects/DEMO/sq010/sh0100/publish/maya/anim/DEMO_sq010_sh0100_anim_v003.ma
+</code></pre>
+<h2 id="3-the-publish-engine">3. The Publish Engine</h2>
+<p>The <code>PublishEngine</code> (<code>omnipipe/core/publish.py</code>) acts as a linear execution pipeline for files entering the production tracking state.</p>
+<h3 id="phase-1-validators">Phase 1: Validators</h3>
+<p>Validators scan files dynamically and physically abort the publish process if criteria aren't met.
+<strong>Example Validator:</strong></p>
+<pre><code class="language-python">from omnipipe.core.publish import ValidatorBase
+
+class CheckSpaceValidator(ValidatorBase):
+    def validate(self, instance) -&gt; bool:
+        if &quot; &quot; in instance.name:
+            raise ValueError(&quot;Spaces are banned in filenames!&quot;)
+        return True
+</code></pre>
+<h3 id="phase-2-extractors">Phase 2: Extractors</h3>
+<p>Extractors derive sub-elements (like Alembic generic caches, Playblasts, or JSON Metadata sidecar payload drops).</p>
+<pre><code class="language-python">from omnipipe.core.publish import ExtractorBase
+
+class PlayblastExtractor(ExtractorBase):
+    def extract(self, instance) -&gt; bool:
+        print(f&quot;Extracting .mp4 from {instance.source_path}&quot;)
+        return True
+</code></pre>
+<h2 id="4-integrating-a-new-dcc">4. Integrating a New DCC</h2>
+<p>To write wrappers for an entirely new software (e.g. Blender or Houdini):
+1. Create a folder: <code>omnipipe/dcc/blender/</code>
+2. Create an <code>api.py</code> implementing the abstract <code>DCCInterface</code> (from <code>omnipipe/dcc/__init__.py</code>).</p>
+<pre><code class="language-python">from omnipipe.dcc import DCCInterface
+
+class BlenderInterface(DCCInterface):
+    def save(self) -&gt; bool:
+        import bpy
+        bpy.ops.wm.save_mainfile()
+        return True
+
+    def get_current_file(self) -&gt; str:
+        import bpy
+        return bpy.data.filepath
+</code></pre>
+<ol>
+<li>Hook your <code>startup.py</code> scripts natively into the software's boot architecture!</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../testing_guide/" class="btn btn-neutral float-left" title="2. QA & Tester Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../artist_guide/" class="btn btn-neutral float-right" title="4. Artist Usage Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../testing_guide/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../artist_guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
