@@ -55,17 +55,19 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#prerequisites">📋 Prerequisites</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#what-does-omnipipe-do">What Does OmniPipe Do?</a>
+    <li class="toctree-l2"><a class="reference internal" href="#the-ui-what-does-omnipipe-do">The UI: What Does OmniPipe Do?</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#1-omnipipe-save-op-save">1. OmniPipe Save (OP Save)</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#2-omnipipe-publish-op-publish">2. OmniPipe Publish (OP Publish)</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#3-omnipipe-load-op-load-load-latest">3. OmniPipe Load (OP Load / Load Latest)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#3-omnipipe-load-load-latest">3. OmniPipe Load (Load Latest)</a>
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#faq">FAQ</a>
+    <li class="toctree-l2"><a class="reference internal" href="#example-workflow-day-in-the-life">Example Workflow (Day in the Life)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#faq-troubleshooting">FAQ &amp; Troubleshooting</a>
     </li>
     </ul>
                   </li>
@@ -94,37 +96,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="artist-guide">Artist Guide</h1>
-<p>Welcome to OmniPipe! This guide is written specifically for 3D Artists, Compositors, and Animators.</p>
-<p>OmniPipe is designed to be completely invisible until you need it. You don't have to navigate messy network folders or worry about naming your files correctly. OmniPipe handles all the boring data management so you can focus strictly on the art!</p>
+                <h1 id="artist-usage-guide">Artist Usage Guide</h1>
+<p>Welcome to OmniPipe! This guide is written specifically for 3D Artists, Compositors, and Animators. </p>
+<p>OmniPipe is designed to be completely invisible until you need it. You don't have to navigate messy network folders, worry about naming your files correctly, or remember where the latest Animation render is stored. OmniPipe handles all the boring data management so you can focus strictly on creating amazing art!</p>
 <hr />
 <h2 id="prerequisites">📋 Prerequisites</h2>
 <p>Before you begin your day:
-1. Ensure your studio TD has provided you with your <code>omnipipe.lic</code> file.
-2. Wait for the <code>Install Complete ✅</code> message from your local workstation script (your coordinator will launch this for you).
-3. Ensure you are connected to the central Studio Server (e.g. <code>Z:\</code> drive).</p>
+1. Ensure your studio TD or Coordinator has provided you with your secure <code>omnipipe.lic</code> file.
+2. Ensure you have run the workstation installer (or wait for the <code>Install Complete ✅</code> message from your coordinator).
+3. Ensure you are connected to the central Studio Server (e.g. <code>Z:\</code> drive on Windows or <code>/mnt/projects</code> on Mac).</p>
 <hr />
-<h2 id="what-does-omnipipe-do">What Does OmniPipe Do?</h2>
-<p>When you are working in Maya, Nuke, or Silhouette, OmniPipe adds three magical buttons to your interface: <strong>Save</strong>, <strong>Publish</strong>, and <strong>Load</strong>.</p>
+<h2 id="the-ui-what-does-omnipipe-do">The UI: What Does OmniPipe Do?</h2>
+<p>When you are working in Maya, Nuke, or Silhouette, OmniPipe adds three magical buttons to your interface: <strong>Save</strong>, <strong>Publish</strong>, and <strong>Load Latest</strong>.</p>
 <h3 id="1-omnipipe-save-op-save">1. OmniPipe Save (OP Save)</h3>
-<p><strong>What it does:</strong> Saves your current work file (often called your <code>work</code> directory).
-- If it is your very first time clicking save on a new file, it will ask you what Shot and Task you are doing, and then physically put the file in the exact right network folder.
-- If you have already saved before, it will just automatically bump up your version number! (e.g. from <code>_v034</code> to <code>_v035</code>).</p>
+<p><strong>Purpose:</strong> Saves your current "Work In Progress" file.
+- If it is your <strong>very first time</strong> clicking save on a brand new empty scene, OmniPipe will ask you what your context is. You simply type the Project (e.g., <code>DEMO</code>), Sequence (<code>sq010</code>), Shot (<code>sh0100</code>), and Task (<code>anim</code>).
+- Once you enter that, it will physically calculate the directory and move the file into the exact correct network folder, naming it <code>DEMO_sq010_sh0100_anim_v001</code>.
+- If you have already saved before, clicking it again will just automatically bump up your version number (e.g. from <code>_v034</code> to <code>_v035</code>). It acts exactly like a smart "Save As".</p>
 <h3 id="2-omnipipe-publish-op-publish">2. OmniPipe Publish (OP Publish)</h3>
-<p><strong>What it does:</strong> Freezes an "approved" version of your work and ships it down the pipeline.
-- Work files (<code>OP Save</code>) are messy and can break. Publishes (<code>OP Publish</code>) are permanent snapshots.
-- When you click Publish, OmniPipe scans your scene for messy geometry names or dangerous links, takes a snapshot, and copies it to a locked <code>publish/</code> folder where Lighters and Compositors can safely grab it.</p>
-<h3 id="3-omnipipe-load-op-load-load-latest">3. OmniPipe Load (OP Load / Load Latest)</h3>
-<p><strong>What it does:</strong> Grabs the absolute latest published file from an upstream department.
-- If you are a Compositor in Nuke and need the latest Animation render, clicking Load Latest will instantly drop the newest Read node into your script, guaranteed to be the version the Director just approved.</p>
+<p><strong>Purpose:</strong> Freezes an "approved" version of your work and ships it down the pipeline.
+- Work files (<code>OP Save</code>) are messy. They are meant for daily WIP (Work in Progress) testing and exploring. Publishes (<code>OP Publish</code>) are permanent snapshots meant to be rendered or passed to other departments.
+- When you click Publish, OmniPipe goes into lockdown:
+    1. It scans your entire scene for messy geometry names or broken texture links.
+    2. It forces a final Save.
+    3. It tracks every asset you imported securely in the background.
+    4. It takes a static snapshot and copies it to a locked, read-only <code>publish/</code> folder where Lighters and Compositors can safely grab it without fear of it being overwritten!</p>
+<h3 id="3-omnipipe-load-load-latest">3. OmniPipe Load (Load Latest)</h3>
+<p><strong>Purpose:</strong> Instantly grabs the absolute latest published file from an upstream department.
+- Imagine you are a Compositor working in Nuke. The animator has been working all weekend and finalized version 47 (<code>_v047.ma</code>). 
+- Instead of manually browsing massive NAS folders looking for it, you just click the <strong>Load Latest</strong> button and type in <code>anim</code>. OmniPipe will instantly drop the absolute newest Read node into your script, guaranteed to be the version the Director just approved.</p>
 <hr />
-<h2 id="faq">FAQ</h2>
+<h2 id="example-workflow-day-in-the-life">Example Workflow (Day in the Life)</h2>
+<p><strong>Morning (10:00 AM)</strong>
+- Open Maya. Create a basic Rig cycle. 
+- Click <strong>OP Save</strong>. The file saves as <code>_v001.ma</code>.</p>
+<p><strong>Afternoon (1:00 PM)</strong>
+- You add heavy physics simulations to the scene. 
+- Click <strong>OP Save</strong>. It realizes you made changes and safely increments the file to <code>_v002.ma</code> so you don't lose the morning's progress.</p>
+<p><strong>Evening (6:00 PM)</strong>
+- The shot looks amazing. The director says "Approved!"
+- Click <strong>OP Publish</strong>. A green success message pops up. Boom — it is instantly securely delivered to the lighting and comp departments downstream. You can shut down your computer and go home.</p>
+<hr />
+<h2 id="faq-troubleshooting">FAQ &amp; Troubleshooting</h2>
 <p><strong>Q: Where did my file just go?</strong>
-A: You can always look at the top of your Maya/Nuke window. OmniPipe automatically names your file based on the Studio naming convention (e.g. <code>DEMO_sq010_sh0100_anim_v001.ma</code>).</p>
+A: You can always look at the top title bar of your Maya/Nuke window. OmniPipe automatically names your file based on the Studio naming convention and places it securely on the network drive (for example: <code>Z:\Projects\DEMO\sq010\sh0100\work\maya\anim\DEMO_sq010...</code>).</p>
 <p><strong>Q: I got a red "VALIDATION ERROR" when publishing! What do I do?</strong>
-A: Read the pop-up carefully. OmniPipe stops you from publishing if you left a space in a node name, or forgot to link a texture. Fix the issue in your scene and click Publish again.</p>
+A: Read the pop-up carefully. OmniPipe stops you from publishing if you broke studio rules (for instance, leaving a space in a node name, or forgetting to link a background texture). Fix the issue in your scene and click Publish again.</p>
 <p><strong>Q: The button disappeared or my software crashed!</strong>
-A: Save your progress manually if you can, restart the app, and if it's still broken, message your Technical Director. They have automated logs they can check to fix it immediately!</p>
+A: That's okay! We track everything. 
+Manually save your progress using the normal app tools if you still can, and restart the software.
+If it constantly crashes, simply navigate to <code>~/omnipipe/logs/</code> entirely outside of the software. Send the most recent <code>.log</code> file in that folder to your Technical Director. It acts like a black-box flight recorder and tells them exactly how to fix the problem instantly!</p>
               
             </div>
           </div><footer>

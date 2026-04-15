@@ -49,15 +49,21 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#prerequisites">📋 Prerequisites</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#step-1-initializing-the-studio-root">Step 1: Initializing the Studio Root</a>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-1-initializing-the-studio-root">Phase 1: Initializing the Studio Root</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#step-2-configuring-the-schema">Step 2: Configuring the Schema</a>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-2-building-the-vendor-dependencies">Phase 2: Building the Vendor Dependencies</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#step-3-setting-up-dependencies">Step 3: Setting Up Dependencies</a>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-3-detailed-configuration-schema-intake">Phase 3: Detailed Configuration (Schema &amp; Intake)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#the-schemayaml">The schema.yaml</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#step-4-workstation-deployment">Step 4: Workstation Deployment</a>
+    <li class="toctree-l3"><a class="reference internal" href="#the-client_intakeyaml">The client_intake.yaml</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#step-5-license-server-optional">Step 5: License Server (Optional)</a>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-4-workstation-deployment-onboarding-artists">Phase 4: Workstation Deployment (Onboarding Artists)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-5-pipeline-updates">Phase 5: Pipeline Updates</a>
     </li>
     </ul>
                   </li>
@@ -93,50 +99,85 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="technical-director-td-guide">Technical Director (TD) Guide</h1>
-<p>Welcome! This guide is explicitly for Technical Directors (TDs), Systems Administrators, or Pipeline Engineers tasked with deploying OmniPipe across a studio network.</p>
+<p>Welcome! This guide is explicitly for Technical Directors (TDs), Systems Administrators, or Pipeline Engineers tasked with deploying OmniPipe across a studio network. </p>
+<p>OmniPipe is designed to act as a <strong>zero-install, centralized pipeline</strong>. This means artists do not need to install Python packages, deal with paths, or configure environment variables. Every workstation boots off a central Studio NAS.</p>
+<hr />
 <h2 id="prerequisites">📋 Prerequisites</h2>
 <p>Before equipping the studio, ensure you have:
-- <strong>Central Storage:</strong> A network-attached storage (NAS) or central file server mapped to a common letter/path across all artist machines (e.g., <code>Z:\</code> or <code>/mnt/projects</code>).
-- <strong>Python 3.10+:</strong> Installed on your admin machine.
-- <strong>Admin Access:</strong> To deploy license keys and workstation install scripts over the network.
-- <strong>Docker:</strong> (Optional but recommended) For running the central License Server.</p>
+- <strong>Central Storage:</strong> A network-attached storage (NAS) or central file server mapped to a common letter/path across all artist machines (e.g., <code>Z:\</code>, <code>X:\</code>, or <code>/mnt/projects</code>).
+- <strong>Python 3.10+:</strong> Installed on your central admin machine to deploy the initial files.
+- <strong>Admin Access:</strong> To mount network drives and execute scripts.</p>
 <hr />
-<h2 id="step-1-initializing-the-studio-root">Step 1: Initializing the Studio Root</h2>
-<p>OmniPipe requires a dedicated "Projects" folder on your NAS.
-1. Run the initialization script to stamp the directory:</p>
-<pre><code class="language-bash">python scripts/init_studio.py --root /mnt/projects --project DEMO \
+<h2 id="phase-1-initializing-the-studio-root">Phase 1: Initializing the Studio Root</h2>
+<p>OmniPipe requires a dedicated central folder on your NAS. You cannot just drop the repository anywhere; it must be "stamped" so the pipeline security wrappers recognize it as a valid OmniPipe ecosystem.</p>
+<ol>
+<li>Clone or copy the <code>StudioPipeline</code> code onto your admin machine.</li>
+<li>Run the initialization script to stamp your network directory and define the primary project constraints:</li>
+</ol>
+<pre><code class="language-bash">python scripts/init_studio.py --root &quot;Z:\Projects&quot; --project DEMO \
   --fps 24 --resolution 1920x1080 
 </code></pre>
-<p><em>This creates the hidden <code>.omnipipe_stamp</code> file validating the NAS drive.</em></p>
-<h2 id="step-2-configuring-the-schema">Step 2: Configuring the Schema</h2>
-<p>The <code>schema.yaml</code> file controls exactly where artist files are saved.
-1. Open <code>configs/schema.yaml</code>
-2. Adjust your mount templates:</p>
+<p><em>What this does:</em>
+Outputs a hidden <code>.omnipipe_stamp</code> file validating the NAS drive. It also creates the <code>DEMO</code> project folder, adding standard pipeline structures inside (like <code>work/</code> and <code>publish/</code>).</p>
+<hr />
+<h2 id="phase-2-building-the-vendor-dependencies">Phase 2: Building the Vendor Dependencies</h2>
+<p>Artists should never have to run <code>pip install</code>. We bundle every required third-party Python library into a network folder.</p>
+<ol>
+<li>In your <code>StudioPipeline</code> code, run:</li>
+</ol>
+<pre><code class="language-bash">python scripts/build_vendor.py
+</code></pre>
+<ol>
+<li>This script downloads packages like <code>typer</code>, <code>rich</code>, and <code>gazu</code> (for Kitsu integration) into your central <code>StudioPipeline/vendor/</code> directory. When artist machines launch the pipeline, OmniPipe automatically appends this path to their <code>sys.path</code> in memory.</li>
+</ol>
+<hr />
+<h2 id="phase-3-detailed-configuration-schema-intake">Phase 3: Detailed Configuration (Schema &amp; Intake)</h2>
+<p>OmniPipe relies entirely on configuration mapping. There are no hardcoded <code>C:\</code> paths in the codebase.</p>
+<h3 id="the-schemayaml">The <code>schema.yaml</code></h3>
+<p>Navigate to <code>configs/schema.yaml</code>. This file is the mathematical mapping engine for where files live across Mac, Linux, and Windows.</p>
+<p><strong>Example Mount Setup:</strong></p>
 <pre><code class="language-yaml">mounts:
   nas_root: 
     windows: 'Z:\Projects'
     mac: '/Volumes/Projects'
     linux: '/mnt/projects'
 </code></pre>
-<ol>
-<li>Customize your standard folder naming conventions under <code>directories</code>.</li>
-</ol>
-<h2 id="step-3-setting-up-dependencies">Step 3: Setting Up Dependencies</h2>
-<p>OmniPipe is zero-install for artists, meaning all their modules load directly from the NAS!
-1. Build the network dependency bundle:</p>
-<pre><code class="language-bash">python scripts/build_vendor.py
+<p><em>If a Mac artist clicks save, the PathResolver dynamically swaps out <code>Z:\</code> for <code>/Volumes/Projects</code> without the artist knowing.</em></p>
+<p><strong>Template Customization:</strong>
+You can rewrite exactly how files are named:</p>
+<pre><code class="language-yaml">templates:
+  publish_file_maya: &quot;{nas_root}/{project}/{sequence}/{shot}/publish/maya/{task}/{project}_{sequence}_{shot}_{task}_v{version}.ma&quot;
 </code></pre>
-<p><em>This downloads libraries like <code>typer</code>, <code>gazu</code>, and <code>rich</code> into the <code>vendor/</code> folder, which is pushed to the pipeline root. Artists won't need to run <code>pip install</code>!</em></p>
-<h2 id="step-4-workstation-deployment">Step 4: Workstation Deployment</h2>
-<p>To attach artists to the pipeline:
-1. Provide artists with the <code>install_workstation.py</code> script.
-2. Share the secret <code>omnipipe.lic</code> file and have them place it in their home directory.
-3. They will run the script, which automatically injects the hooks into Maya, Nuke, and Silhouette.</p>
-<h2 id="step-5-license-server-optional">Step 5: License Server (Optional)</h2>
-<p>If utilizing Layer 3 tracking:
-1. Copy the <code>license_server/</code> folder to a secure Docker host.
-2. Run <code>docker-compose up -d</code>.
-3. Distribute the host IP to <code>configs/license.ini</code> so artists phone-home to your server.</p>
+<h3 id="the-client_intakeyaml">The <code>client_intake.yaml</code></h3>
+<p>This is your actual production tracker. Fill this out to define your valid sequences and shots. </p>
+<pre><code class="language-yaml">project: DEMO
+sequences:
+  sq010:
+    fps: 24
+    shots:
+      sh0100:
+        tasks: [anim, fx, comp]
+</code></pre>
+<p><em>If an artist tries to publish a shot that is not in this document, the pipeline will actively block the save to prevent phantom directories.</em></p>
+<hr />
+<h2 id="phase-4-workstation-deployment-onboarding-artists">Phase 4: Workstation Deployment (Onboarding Artists)</h2>
+<p>How do you get artists working? You do not need to install complex software on their machine.</p>
+<ol>
+<li><strong>Mount the Network Drive:</strong> Ensure the artist's computer has <code>Z:\Projects</code> (or the equivalent Mac/Linux mount) properly configured.</li>
+<li><strong>Distribute the Connect Script:</strong> Copy <code>scripts/install_workstation.py</code> to the artist's local computer.</li>
+<li><strong>Execute:</strong> The artist double-clicks or runs the install script.</li>
+</ol>
+<pre><code class="language-bash">python install_workstation.py --studio-root &quot;Z:\Projects&quot;
+</code></pre>
+<ol>
+<li><strong>Result:</strong> The script modifies the artist's local <code>Maya.env</code> and Nuke plugins folder, pointing them securely back to your network NAS. </li>
+<li><em>(Optional) Security License:</em> Have your artists place the generated <code>omnipipe.lic</code> file into their safe <code>~</code> (Home) directory, otherwise the <code>omnipipe publish</code> button will be locked out for them.</li>
+</ol>
+<hr />
+<h2 id="phase-5-pipeline-updates">Phase 5: Pipeline Updates</h2>
+<p>If you (the TD) edit a core Python file in <code>omnipipe/core/</code> and push it to the main branch, <strong>how do artists get the update?</strong>
+- You pull the code down to the central Network Drive.
+- Because all artists are mapped via the Workstation Connect script back to the NAS <code>__init__.py</code>, the next time they open Maya or Nuke, they instantly run the new code! Zero redeployment necessary.</p>
               
             </div>
           </div><footer>
