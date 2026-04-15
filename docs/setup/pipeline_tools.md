@@ -17,6 +17,7 @@ This section documents all production-ready tools in OmniPipe. Each tool address
 | [`omnipipe publish`](#omnipipe-publish) | CLI | Publish files through full pipeline lifecycle |
 | [`omnipipe load-latest`](#omnipipe-load-latest) | CLI | Resolve latest published version per shot/task |
 | [`install_maya_hook.py`](#maya-startup-hook) | Script | Installs OmniPipe shelf into Maya |
+| [`install_nuke_hook.py`](#nuke-startup-hook) | Script | Installs OmniPipe menu into Nuke |
 
 ---
 
@@ -505,3 +506,52 @@ python3 scripts/install_maya_hook.py --maya-dir /custom/maya/scripts
 1. Copies `userSetup.py` into Maya's scripts directory
 2. Backs up any existing `userSetup.py` as `.py.bak_omnipipe`
 3. Writes `OMNIPIPE_REPO_ROOT` into `Maya.env` so startup.py can find the repo
+
+---
+
+## Nuke Startup Hook
+
+**Files:**
+- `omnipipe/dcc/nuke/startup.py` — startup logic (license check + menu builder)
+- `omnipipe/dcc/nuke/menu.py` — Nuke bootstrap file
+- `scripts/install_nuke_hook.py` — installer script
+
+### What happens when Nuke starts
+
+```
+Nuke boots → scans NUKE_PATH for menu.py → executes it
+  → omnipipe.dcc.nuke.startup.bootstrap() runs:
+      1. Injects repo root + vendor into sys.path
+      2. Validates license (Layer 1 + Layer 2)
+      3. If valid → builds OmniPipe menu bar (5 commands)
+      4. If invalid → menu items show LOCKED + license error
+```
+
+### OmniPipe menu commands
+
+| Command | Shortcut | What it does |
+|---|---|---|
+| **Save** | `Ctrl+S` | License-gated `nuke.scriptSave()` |
+| **Save Version Up** | `Ctrl+Shift+S` | Auto `_v003` → `_v004` bump & save |
+| **Publish** | — | Copies to publish path + metadata sidecar |
+| **Load Latest (Read Node)** | — | Prompts for shot context → creates Read node |
+| **Doctor** | — | Runs `omnipipe doctor` in console |
+
+### Installing the hook
+
+```bash
+# Default install
+python3 scripts/install_nuke_hook.py
+
+# Specific Nuke version
+python3 scripts/install_nuke_hook.py --nuke-version 14.0
+
+# Custom plugin directory
+python3 scripts/install_nuke_hook.py --nuke-dir /studio/nuke/plugins
+```
+
+### Nuke plugin directory
+
+All platforms use `~/.nuke/` by default. The installer writes:
+- `menu.py` — the OmniPipe bootstrap
+- `init.py` — sets `OMNIPIPE_REPO_ROOT` environment variable

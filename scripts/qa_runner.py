@@ -401,6 +401,34 @@ def test_b4_maya_version_up_and_metadata():
 
 run_test("B4", "MayaDCC.save_version_up + is_scene_modified exist, dev-mode returns empty", test_b4_maya_version_up_and_metadata)
 
+
+# -----------------------------------------------------------------------
+# B5+B6+B7: NUKE INTEGRATION — startup + publish + loader
+# -----------------------------------------------------------------------
+def test_b5_nuke_startup_importable():
+    """Verify the Nuke startup module can be imported outside Nuke."""
+    from omnipipe.dcc.nuke import startup
+    assert hasattr(startup, "bootstrap"), "Missing bootstrap()"
+    assert hasattr(startup, "_validate_license"), "Missing _validate_license()"
+    assert hasattr(startup, "_create_menu"), "Missing _create_menu()"
+
+run_test("B5", "Nuke startup module importable with bootstrap/_create_menu", test_b5_nuke_startup_importable)
+
+
+def test_b6_b7_nuke_dcc_methods():
+    """Verify NukeDCC has version-bump, publish, and load_latest_as_read."""
+    from omnipipe.dcc.nuke.api import NukeDCC
+    dcc = NukeDCC()
+    assert hasattr(dcc, "save_version_up"), "Missing save_version_up()"
+    assert hasattr(dcc, "is_script_modified"), "Missing is_script_modified()"
+    assert hasattr(dcc, "load_latest_as_read"), "Missing load_latest_as_read()"
+    # Dev mode: version_up returns empty on no scene
+    assert dcc.save_version_up() == ""
+    # Dev mode: load_latest_as_read returns False on missing dir
+    assert dcc.load_latest_as_read("/tmp/nonexistent_dir_qa") is False
+
+run_test("B6+B7", "NukeDCC.save_version_up + load_latest_as_read exist, dev-mode safe", test_b6_b7_nuke_dcc_methods)
+
 # -----------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------
