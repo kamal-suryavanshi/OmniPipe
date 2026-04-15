@@ -203,6 +203,16 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#omnipipe-login-kitsu-integration">omnipipe login (Kitsu Integration)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#usage_4">Usage</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#authentication-configuration">Authentication Configuration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-omnipipe-can-read">What OmniPipe can read</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../license_server/">License Server (Person C)</a>
@@ -1100,6 +1110,27 @@ python3 scripts/install_nuke_hook.py --nuke-dir /studio/nuke/plugins
 </tr>
 </tbody>
 </table>
+<hr />
+<h2 id="omnipipe-login-kitsu-integration"><code>omnipipe login</code> (Kitsu Integration)</h2>
+<p><strong>Command:</strong> <code>omnipipe login</code></p>
+<p>OmniPipe interfaces with <a href="https://cgwire.com/kitsu">Kitsu</a> (Zou backend) for production tracking and asset management. </p>
+<h3 id="usage_4">Usage</h3>
+<pre><code class="language-bash">omnipipe login
+</code></pre>
+<h3 id="authentication-configuration">Authentication Configuration</h3>
+<p>OmniPipe uses the <code>KitsuAdapter</code> module to connect. Store your credentials in your <code>.env</code> file at the root of your pipeline:</p>
+<pre><code class="language-bash">KITSU_HOST=&quot;http://localhost/api&quot;
+KITSU_LOGIN=&quot;admin@example.com&quot;
+KITSU_PWD=&quot;your_secure_password&quot;
+</code></pre>
+<p><em>Note: In a true production environment, <code>KITSU_PWD</code> should be an application API token, not a user password.</em></p>
+<h3 id="what-omnipipe-can-read">What OmniPipe can read</h3>
+<p>The <code>KitsuAdapter</code> currently provides these read operations for context resolution and validation:
+- <code>get_project(project_name)</code>
+- <code>get_sequence(project, sequence_name)</code>
+- <code>get_shot(sequence, shot_name)</code>
+- <code>get_task(shot, task_type_name)</code>
+- <code>my_tasks()</code> — Fetches a list of tasks assigned to the currently authenticated pipeline user.</p>
               
             </div>
           </div><footer>
