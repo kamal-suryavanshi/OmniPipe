@@ -195,6 +195,14 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#silhouette-startup-hook">Silhouette Startup Hook</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#what-happens-when-silhouette-starts">What happens when Silhouette starts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#omnipipe-menuaction-hooks">OmniPipe menu/action hooks</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../license_server/">License Server (Person C)</a>
@@ -1053,6 +1061,45 @@ python3 scripts/install_nuke_hook.py --nuke-dir /studio/nuke/plugins
 <p>All platforms use <code>~/.nuke/</code> by default. The installer writes:
 - <code>menu.py</code> — the OmniPipe bootstrap
 - <code>init.py</code> — sets <code>OMNIPIPE_REPO_ROOT</code> environment variable</p>
+<hr />
+<h2 id="silhouette-startup-hook">Silhouette Startup Hook</h2>
+<p><strong>Files:</strong>
+- <code>omnipipe/dcc/silhouette/startup.py</code> — startup logic (license check + hook registry)</p>
+<h3 id="what-happens-when-silhouette-starts">What happens when Silhouette starts</h3>
+<pre><code>Silhouette boots → invokes predefined scripts or user runs it
+  → omnipipe.dcc.silhouette.startup.bootstrap() runs:
+      1. Injects repo root + vendor into sys.path
+      2. Validates license (Layer 1 + Layer 2)
+      3. If valid → Adds OmniPipe menu to fx.menu() or binds to fx.bind()
+      4. If invalid → Locks menu actions + shows license error
+</code></pre>
+<h3 id="omnipipe-menuaction-hooks">OmniPipe menu/action hooks</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Save</strong></td>
+<td>License-gated <code>fx.activeProject().save()</code></td>
+</tr>
+<tr>
+<td><strong>Save Version Up</strong></td>
+<td>Auto <code>_v003</code> → <code>_v004</code> bump &amp; save</td>
+</tr>
+<tr>
+<td><strong>Publish</strong></td>
+<td>Copies to publish path + metadata sidecar</td>
+</tr>
+<tr>
+<td><strong>Export Shapes (Nuke)</strong></td>
+<td>Exports Silhouette shapes to Nuke <code>.nk</code> format</td>
+</tr>
+</tbody>
+</table>
               
             </div>
           </div><footer>
