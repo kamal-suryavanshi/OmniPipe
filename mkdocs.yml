@@ -5,22 +5,8 @@ theme: readthedocs
 
 nav:
   - Home: index.md
-  - CLI Cheatsheet (Usage): cheatsheet.md
-  - Master Test Plan: test_plan.md
-  - QA Testing Guide (For Non-Techies): qa_testing_guide.md
-  - Studio Setup & Onboarding:
-    - "▶ Studio Setup Guide (Start Here)": setup/studio_setup_guide.md
-    - Onboarding Guide: setup/onboarding.md
-    - Intake Form Reference: setup/intake_form_reference.md
-    - Pipeline Tools Reference: setup/pipeline_tools.md
-    - License Server (Person C): setup/license_server.md
-  - Architecture Walkthroughs:
-    - Task 1 & 2 (Repo & Context): walkthroughs/task_1_2.md
-    - Task 3 (Path Manager): walkthroughs/task_3.md
-    - Task 4 (Publish Design): walkthroughs/task_4.md
-    - Task 5 (Validators): walkthroughs/task_5.md
-    - Task 6 (Extractors): walkthroughs/task_6.md
-    - Task 7 (Metadata): walkthroughs/task_7.md
-    - Task 8 (Dependency Tracking): walkthroughs/task_8.md
-    - Task 9 (License System): walkthroughs/task_9.md
-    - Task 10 (Error Handling): walkthroughs/task_10.md
+  - Guides:
+    - 1. Technical Director (TD) Guide: guides/td_guide.md
+    - 2. QA & Tester Guide: guides/testing_guide.md
+    - 3. Pipeline Developer Guide: guides/developer_guide.md
+    - 4. Artist Usage Guide: guides/artist_guide.md

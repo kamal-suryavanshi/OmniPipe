@@ -1,0 +1,7 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting mkdocs
+  Downloading mkdocs-1.6.1-py3-none-any.whl (3.9 MB)
+ERROR: Could not find a version that satisfies the requirement mkdocs-readthedocs-plugin (from versions: none)
+ERROR: No matching distribution found for mkdocs-readthedocs-plugin
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --upgrade pip' command.

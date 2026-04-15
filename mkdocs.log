@@ -1,0 +1,102 @@
+INFO    -  Building documentation...
+INFO    -  Cleaning site directory
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - walkthroughs/dcc_integrations.md
+INFO    -  Documentation built in 0.19 seconds
+INFO    -  [23:18:22] Watching paths for changes: 'docs', 'mkdocs.yml'
+INFO    -  [23:18:22] Serving on http://127.0.0.1:8000/OmniPipe/
+INFO    -  [23:19:17] Browser connected: http://127.0.0.1:8000/OmniPipe/
+INFO    -  [23:19:34] Browser connected: http://127.0.0.1:8000/OmniPipe/qa_testing_guide/
+INFO    -  [23:21:58] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/studio_setup_guide/
+INFO    -  [23:22:15] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_1_2/
+INFO    -  [23:22:17] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_3/
+INFO    -  [23:22:20] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_5/
+INFO    -  [23:22:22] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_6/
+INFO    -  [23:22:25] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_7/
+INFO    -  [23:22:28] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_8/
+INFO    -  [23:22:33] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_9/
+INFO    -  [23:22:39] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_10/
+INFO    -  [23:22:41] Browser connected: http://127.0.0.1:8000/OmniPipe/walkthroughs/task_1_2/
+INFO    -  [23:23:23] Browser connected: http://127.0.0.1:8000/OmniPipe/cheatsheet/
+INFO    -  [23:23:31] Browser connected: http://127.0.0.1:8000/OmniPipe/test_plan/
+INFO    -  [23:23:40] Browser connected: http://127.0.0.1:8000/OmniPipe/cheatsheet/
+INFO    -  [23:23:43] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/studio_setup_guide/
+INFO    -  [23:23:46] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/onboarding/
+INFO    -  [23:23:51] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/intake_form_reference/
+INFO    -  [23:23:56] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:33:08] Detected file changes
+INFO    -  Building documentation...
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - guides/td_guide.md
+  - walkthroughs/dcc_integrations.md
+INFO    -  Documentation built in 0.21 seconds
+INFO    -  [23:33:08] Reloading browsers
+INFO    -  [23:33:08] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:33:24] Detected file changes
+INFO    -  Building documentation...
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - guides/td_guide.md
+  - guides/testing_guide.md
+  - walkthroughs/dcc_integrations.md
+INFO    -  [23:33:24] Reloading browsers
+INFO    -  [23:33:24] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:33:39] Detected file changes
+INFO    -  Building documentation...
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - guides/developer_guide.md
+  - guides/td_guide.md
+  - guides/testing_guide.md
+  - walkthroughs/dcc_integrations.md
+INFO    -  [23:33:40] Reloading browsers
+INFO    -  [23:33:40] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:33:44] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:33:45] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:33:54] Detected file changes
+INFO    -  Building documentation...
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - guides/artist_guide.md
+  - guides/developer_guide.md
+  - guides/td_guide.md
+  - guides/testing_guide.md
+  - walkthroughs/dcc_integrations.md
+INFO    -  [23:33:54] Reloading browsers
+INFO    -  [23:33:54] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:34:06] Detected file changes
+INFO    -  Building documentation...
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - guides/artist_guide.md
+  - guides/developer_guide.md
+  - guides/td_guide.md
+  - guides/testing_guide.md
+  - walkthroughs/dcc_integrations.md
+INFO    -  Documentation built in 0.25 seconds
+INFO    -  [23:34:06] Reloading browsers
+INFO    -  [23:34:06] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:34:15] Detected file changes
+INFO    -  Building documentation...
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - cheatsheet.md
+  - qa_testing_guide.md
+  - test_plan.md
+  - setup/intake_form_reference.md
+  - setup/license_server.md
+  - setup/onboarding.md
+  - setup/pipeline_tools.md
+  - setup/studio_setup_guide.md
+  - walkthroughs/dcc_integrations.md
+  - walkthroughs/task_10.md
+  - walkthroughs/task_1_2.md
+  - walkthroughs/task_3.md
+  - walkthroughs/task_4.md
+  - walkthroughs/task_5.md
+  - walkthroughs/task_6.md
+  - walkthroughs/task_7.md
+  - walkthroughs/task_8.md
+  - walkthroughs/task_9.md
+INFO    -  [23:34:15] Reloading browsers
+INFO    -  [23:34:15] Browser connected: http://127.0.0.1:8000/OmniPipe/setup/pipeline_tools/
+INFO    -  [23:34:23] Detected file changes
+INFO    -  Building documentation...
+INFO    -  Documentation built in 0.09 seconds
+INFO    -  [23:34:23] Reloading browsers
+WARNING -  [23:34:23] "GET /OmniPipe/setup/pipeline_tools/ HTTP/1.1" code 404
