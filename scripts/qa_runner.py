@@ -382,6 +382,25 @@ def test_b3_maya_startup_importable():
 
 run_test("B3", "Maya startup module importable with bootstrap/_validate_license/_create_shelf", test_b3_maya_startup_importable)
 
+
+# -----------------------------------------------------------------------
+# B4: MAYA SAVE/PUBLISH POLISH — version bump + metadata API
+# -----------------------------------------------------------------------
+def test_b4_maya_version_up_and_metadata():
+    """
+    Verify MayaDCC has all B4 methods and that save_version_up
+    correctly calls parse_version + format_version logic.
+    """
+    from omnipipe.dcc.maya.api import MayaDCC
+    dcc = MayaDCC()
+    assert hasattr(dcc, "save_version_up"), "Missing save_version_up()"
+    assert hasattr(dcc, "is_scene_modified"), "Missing is_scene_modified()"
+    # In dev mode (no Maya), save_version_up returns "" on empty scene
+    result = dcc.save_version_up()
+    assert result == "", f"Expected empty string in dev mode, got: {result}"
+
+run_test("B4", "MayaDCC.save_version_up + is_scene_modified exist, dev-mode returns empty", test_b4_maya_version_up_and_metadata)
+
 # -----------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------

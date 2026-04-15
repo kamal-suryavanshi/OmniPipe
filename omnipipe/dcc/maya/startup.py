@@ -91,6 +91,16 @@ def _create_shelf():
         sourceType="python",
     )
 
+    # ── Version Up button ─────────────────────────────────────────────────
+    cmds.shelfButton(
+        parent=shelf_name,
+        label="OP Save +1",
+        annotation="OmniPipe: Auto version-bump and save (_v003 → _v004)",
+        image1="saveAs.png",
+        command=_shelf_cmd_version_up(),
+        sourceType="python",
+    )
+
     # ── Publish button ────────────────────────────────────────────────────
     cmds.shelfButton(
         parent=shelf_name,
@@ -121,31 +131,65 @@ def _create_shelf():
         sourceType="python",
     )
 
-    print("[OmniPipe] Shelf 'OmniPipe' installed with 4 buttons.")
+    print("[OmniPipe] Shelf 'OmniPipe' installed with 5 buttons.")
 
 
 def _shelf_cmd_save():
-    return """
-from omnipipe.dcc.maya.api import MayaDCC
-dcc = MayaDCC()
-result = dcc.save_file()
-if result:
-    import maya.cmds as cmds
-    cmds.inViewMessage(msg='<span style="color:#00ff88;">OmniPipe: Saved ✓</span>', pos='topCenter', fade=True)
-"""
-
-
-def _shelf_cmd_publish():
     return """
 import maya.cmds as cmds
 from omnipipe.dcc.maya.api import MayaDCC
 
 dcc = MayaDCC()
 current = dcc.get_current_file()
-if not current or current == '[MAYA DEV MODE] Returning dummy scene path.':
+if not current:
+    cmds.warning('OmniPipe: Scene has no name. Use File → Save As first, or OP Save +1.')
+else:
+    result = dcc.save_file()
+    if result:
+        cmds.inViewMessage(msg='<span style="color:#00ff88;">OmniPipe: Saved ✓</span>', pos='topCenter', fade=True)
+    else:
+        cmds.warning('OmniPipe: Save FAILED — check Script Editor for details.')
+"""
+
+
+def _shelf_cmd_version_up():
+    return """
+import maya.cmds as cmds
+from omnipipe.dcc.maya.api import MayaDCC
+import os
+
+dcc = MayaDCC()
+current = dcc.get_current_file()
+if not current:
+    cmds.warning('OmniPipe: Scene has no name. Use File → Save As first.')
+else:
+    new_path = dcc.save_version_up()
+    if new_path:
+        name = os.path.basename(new_path)
+        cmds.inViewMessage(msg=f'<span style="color:#00ff88;">Version Up: {name} ✓</span>', pos='topCenter', fade=True)
+    else:
+        cmds.warning('OmniPipe: Version Up FAILED — check Script Editor.')
+"""
+
+
+def _shelf_cmd_publish():
+    return """
+import maya.cmds as cmds, os
+from omnipipe.dcc.maya.api import MayaDCC
+
+dcc = MayaDCC()
+current = dcc.get_current_file()
+if not current:
     cmds.warning('OmniPipe: No scene is open. Save your scene first.')
 else:
-    result = dcc.publish(current.replace('/work/', '/publish/'))
+    # Determine publish path: swap /work/ → /publish/ in the file path
+    if '/work/' in current:
+        publish_path = current.replace('/work/', '/publish/')
+    else:
+        # Fallback: put in a 'publish' sibling directory
+        d = os.path.dirname(current)
+        publish_path = os.path.join(os.path.dirname(d), 'publish', os.path.basename(current))
+    result = dcc.publish(publish_path)
     if result:
         cmds.inViewMessage(msg='<span style="color:#00ff88;">OmniPipe: Published ✓</span>', pos='topCenter', fade=True)
     else:
