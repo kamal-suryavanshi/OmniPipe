@@ -161,34 +161,32 @@ def doctor(
 ):
     """
     Run a full post-deploy health check on this machine.
-
-    Validates:
-      • Python version
-      • pip dependencies importable
-      • License file present and cryptographically valid
-      • NAS root is mounted and writable (if --studio-root provided)
-      • schema.yaml is parseable
-      • Studio stamp file exists (if --project provided)
-
-    Exit code 0 = fully healthy. Non-zero = at least one check failed.
     """
-    import sys
+    import sys, time
     from pathlib import Path
+    from rich.console import Console
+    from rich.table import Table
+    from rich.panel import Panel
+    from rich.progress import Progress, SpinnerColumn, TextColumn
 
+    console = Console()
     issues = []
 
-    typer.echo()
-    typer.secho("  OmniPipe Doctor — Environment Health Check", bold=True)
-    typer.echo(f"  Platform : {sys.platform}  |  Python {sys.version.split()[0]}")
-    typer.echo("  " + "─" * 60)
+    console.print()
+    console.print(Panel(f"[bold cyan]Platform:[/bold cyan] {sys.platform}  |  [bold cyan]Python:[/bold cyan] {sys.version.split()[0]}", title="[bold]OmniPipe Doctor — Environment Health Check[/bold]", border_style="cyan"))
+    
+    table = Table(show_header=True, header_style="bold magenta")
+    table.add_column("Status", style="dim", width=4)
+    table.add_column("Check", min_width=30)
+    table.add_column("Details")
 
     # ── 1. Python version ────────────────────────────────────────────────────
     v = sys.version_info
     if v >= (3, 10):
-        typer.secho(f"  ✅  Python {v.major}.{v.minor} — OK", fg=typer.colors.GREEN)
+        table.add_row("✅", "Python Version", f"3.10+ ({v.major}.{v.minor})")
     else:
         msg = f"Python {v.major}.{v.minor} below required 3.10"
-        typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+        table.add_row("❌", "Python Version", f"[red]{msg}[/red]")
         issues.append(msg)
 
     # ── 2. Core imports ──────────────────────────────────────────────────────
@@ -196,10 +194,10 @@ def doctor(
                      "omnipipe.core.license", "omnipipe.core.versioning"]:
         try:
             __import__(mod_name)
-            typer.secho(f"  ✅  Import {mod_name}", fg=typer.colors.GREEN)
+            table.add_row("✅", "Import", mod_name)
         except ImportError as e:
             msg = f"Cannot import {mod_name}: {e}"
-            typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+            table.add_row("❌", "Import", f"[red]{msg}[/red]")
             issues.append(msg)
 
     # ── 3. License ───────────────────────────────────────────────────────────
@@ -209,15 +207,15 @@ def doctor(
             from omnipipe.core.license import validate_license
             ok, msg = validate_license()
             if ok:
-                typer.secho(f"  ✅  License: {msg}", fg=typer.colors.GREEN)
+                table.add_row("✅", "License Valid", f"[green]{msg}[/green]")
             else:
-                typer.secho(f"  ❌  License INVALID: {msg}", fg=typer.colors.RED)
+                table.add_row("❌", "License Invalid", f"[red]{msg}[/red]")
                 issues.append(f"License invalid: {msg}")
         except Exception as e:
-            typer.secho(f"  ⚠️   License check error: {e}", fg=typer.colors.YELLOW)
+            table.add_row("⚠️", "License Error", f"[yellow]{e}[/yellow]")
     else:
         msg = f"No license file at {lic_path}"
-        typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+        table.add_row("❌", "License Missing", f"[red]{msg}[/red]")
         issues.append(msg)
 
     # ── 4. Schema YAML ───────────────────────────────────────────────────────
@@ -227,62 +225,58 @@ def doctor(
         try:
             import yaml
             yaml.safe_load(schema_path.read_text())
-            typer.secho(f"  ✅  schema.yaml parseable", fg=typer.colors.GREEN)
+            table.add_row("✅", "Schema YAML", "Parseable")
         except Exception as e:
             msg = f"schema.yaml parse error: {e}"
-            typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+            table.add_row("❌", "Schema YAML", f"[red]{msg}[/red]")
             issues.append(msg)
     else:
         msg = f"schema.yaml missing at {schema_path}"
-        typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+        table.add_row("❌", "Schema YAML", f"[red]{msg}[/red]")
         issues.append(msg)
 
     # ── 5. NAS root mount + write check ──────────────────────────────────────
     if studio_root:
         nas_path = Path(studio_root)
         if nas_path.exists():
-            # Check writable
             probe = nas_path / ".omnipipe_probe"
             try:
                 probe.write_text("probe")
                 probe.unlink()
-                typer.secho(f"  ✅  NAS root mounted and writable: {nas_path}", fg=typer.colors.GREEN)
+                table.add_row("✅", "NAS Mount", f"Mounted & Writable: {nas_path}")
             except OSError as e:
                 msg = f"NAS not writable: {e}"
-                typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+                table.add_row("❌", "NAS Mount", f"[red]{msg}[/red]")
                 issues.append(msg)
         else:
             msg = f"NAS root NOT mounted: {nas_path}"
-            typer.secho(f"  ❌  {msg}", fg=typer.colors.RED)
+            table.add_row("❌", "NAS Mount", f"[red]{msg}[/red]")
             issues.append(msg)
     else:
-        typer.secho("  ⚠️   NAS root not supplied — skipping mount check (use --studio-root)", fg=typer.colors.YELLOW)
+        table.add_row("⚠️", "NAS Mount", "[yellow]Skipped (use --studio-root)[/yellow]")
 
     # ── 6. Studio stamp ───────────────────────────────────────────────────────
     if studio_root and project_code:
         stamp = Path(studio_root) / project_code / ".omnipipe_stamp"
         if stamp.exists():
-            typer.secho(f"  ✅  Studio stamp found: {stamp}", fg=typer.colors.GREEN)
+            table.add_row("✅", "Studio Stamp", f"Found: {stamp}")
         else:
-            msg = f"Studio stamp missing — run init_studio.py first: {stamp}"
-            typer.secho(f"  ⚠️   {msg}", fg=typer.colors.YELLOW)
+            msg = f"Stamp missing (run init_studio.py first)"
+            table.add_row("⚠️", "Studio Stamp", f"[yellow]{msg}[/yellow]")
 
+    console.print(table)
+    
     # ── Summary ───────────────────────────────────────────────────────────────
-    typer.echo("  " + "─" * 60)
     if not issues:
-        typer.secho("\n  🎉  All checks PASSED — this machine is pipeline-healthy!\n", fg=typer.colors.GREEN)
+        console.print("\n[bold green]🎉 All checks PASSED — this machine is pipeline-healthy![/bold green]\n")
         raise typer.Exit(0)
     else:
-        typer.secho(f"\n  ❌  {len(issues)} issue(s) found:\n", fg=typer.colors.RED)
+        console.print(f"\n[bold red]❌ {len(issues)} issue(s) found:[/bold red]")
         for i, issue in enumerate(issues, 1):
-            typer.echo(f"     {i}. {issue}")
-        typer.echo()
+            console.print(f"  {i}. {issue}")
+        console.print()
         raise typer.Exit(1)
 
-
-# -----------------------------------------------------------------------
-# B1: PUBLISH — Trigger PublishEngine from CLI
-# -----------------------------------------------------------------------
 @app.command("publish")
 def publish(
     source: str = typer.Argument(..., help="Path to the source file to publish"),
@@ -299,40 +293,38 @@ def publish(
     Publish a file through the full OmniPipe pipeline.
 
     Runs: License check → Validators → Extractors → Dependency Tracking → Metadata JSON.
-
-    Example:
-      omnipipe publish /mnt/nas/projects/PROJ/work/maya/anim/hero_v003.ma \\
-        --project PROJ --sequence sq001 --shot sh0010 --task anim --dcc maya
     """
-    import os
+    import os, time
     from pathlib import Path as P
+    from rich.console import Console
+    from rich.progress import Progress, SpinnerColumn, TextColumn
+    from rich.panel import Panel
+    
+    console = Console()
 
     # ── Validate source file exists ───────────────────────────────────────
     if not os.path.isfile(source):
-        typer.secho(f"\n  ❌  Source file not found: {source}", fg=typer.colors.RED)
+        console.print(Panel(f"[bold red]❌ Source file not found:[/bold red]\n{source}", border_style="red"))
         raise typer.Exit(1)
 
     # ── License check (Layer 1) ───────────────────────────────────────────
     from omnipipe.core.license import validate_license
-    is_valid, lic_msg = validate_license()
+    with console.status("[cyan]Verifying OmniPipe license...", spinner="dots"):
+        is_valid, lic_msg = validate_license()
+        time.sleep(0.5) # subtle UX delay for checking
+    
     if not is_valid:
-        typer.secho(f"\n  ❌  {lic_msg}", fg=typer.colors.RED)
-        typer.secho("     Publishing requires a valid license.", fg=typer.colors.YELLOW)
+        console.print(Panel(f"[bold red]❌ License Invalid:[/bold red] {lic_msg}\n[yellow]Publishing requires a valid license.[/yellow]", border_style="red"))
         raise typer.Exit(1)
-
-    typer.secho(f"  ✅  {lic_msg}", fg=typer.colors.GREEN)
 
     # ── Build context ─────────────────────────────────────────────────────
     from omnipipe.core.context import PipelineContext, PathResolver
-    from omnipipe.core.versioning import get_latest_version, format_version
+    from omnipipe.core.versioning import get_latest_version, format_version, parse_version
 
-    # Auto-detect version from filename if not explicitly provided
     if not version:
-        from omnipipe.core.versioning import parse_version
         filename = os.path.basename(source)
         v = parse_version(filename)
         version = format_version(v) if v else "v001"
-        typer.echo(f"  Auto-detected version: {version}")
 
     ctx = PipelineContext(
         project=project, sequence=sequence, shot=shot,
@@ -344,14 +336,15 @@ def publish(
         resolver = PathResolver()
         publish_path = resolver.resolve(f"publish_file_{dcc}", ctx)
     except Exception as e:
-        typer.secho(f"\n  ❌  Could not resolve publish path: {e}", fg=typer.colors.RED)
+        console.print(Panel(f"[bold red]❌ Context Error:[/bold red] Could not resolve publish path:\n{e}", border_style="red"))
         raise typer.Exit(1)
 
-    typer.echo(f"  Source:  {source}")
-    typer.echo(f"  Target:  {publish_path}")
+    console.print(f"[bold blue]Pipeline Context:[/bold blue] {project} ⟩ {sequence} ⟩ {shot} ⟩ {task} ({dcc} {version})")
+    console.print(f"  [dim]Source:[/dim] {source}")
+    console.print(f"  [dim]Target:[/dim] {publish_path}")
 
     if dry_run:
-        typer.secho(f"\n  [DRY RUN] Validation passed. No files were written.\n", fg=typer.colors.YELLOW)
+        console.print("\n[bold yellow]⚠️ [DRY RUN] Validation passed. No files were written.[/bold yellow]\n")
         raise typer.Exit(0)
 
     # ── Run PublishEngine ─────────────────────────────────────────────────
@@ -367,13 +360,22 @@ def publish(
     engine = PublishEngine(enable_tracking=enable_tracking)
     engine.add_instance(inst)
 
-    typer.echo("\n  Running PublishEngine…")
-    success = engine.run()
+    console.print("\n[bold magenta]🚀 Executing Publish Pipeline...[/bold magenta]")
+    
+    # Fake progress wrapper to display beautiful UX over the exact engine.run() hook
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        task1 = progress.add_task("[cyan]Validating and executing plugins...", total=None)
+        success = engine.run()
+        progress.update(task1, completed=100)
 
     if success:
-        typer.secho(f"\n  🎉  Published successfully → {publish_path}\n", fg=typer.colors.GREEN)
+        console.print(Panel(f"[bold green]🎉 Published successfully![/bold green]\nTarget: {publish_path}", title="Success", border_style="green"))
     else:
-        typer.secho(f"\n  ❌  Publish FAILED — check logs for details.\n", fg=typer.colors.RED)
+        console.print(Panel(f"[bold red]❌ Publish FAILED[/bold red]\nCheck logs for details.", border_style="red"))
         raise typer.Exit(1)
 
 
