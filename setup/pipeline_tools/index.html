@@ -183,6 +183,18 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nuke-startup-hook">Nuke Startup Hook</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#what-happens-when-nuke-starts">What happens when Nuke starts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#omnipipe-menu-commands">OmniPipe menu commands</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installing-the-hook_1">Installing the hook</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#nuke-plugin-directory">Nuke plugin directory</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../license_server/">License Server (Person C)</a>
@@ -290,6 +302,11 @@
 <td><a href="#maya-startup-hook"><code>install_maya_hook.py</code></a></td>
 <td>Script</td>
 <td>Installs OmniPipe shelf into Maya</td>
+</tr>
+<tr>
+<td><a href="#nuke-startup-hook"><code>install_nuke_hook.py</code></a></td>
+<td>Script</td>
+<td>Installs OmniPipe menu into Nuke</td>
 </tr>
 </tbody>
 </table>
@@ -971,6 +988,71 @@ python3 scripts/install_maya_hook.py --maya-dir /custom/maya/scripts
 <li>Backs up any existing <code>userSetup.py</code> as <code>.py.bak_omnipipe</code></li>
 <li>Writes <code>OMNIPIPE_REPO_ROOT</code> into <code>Maya.env</code> so startup.py can find the repo</li>
 </ol>
+<hr />
+<h2 id="nuke-startup-hook">Nuke Startup Hook</h2>
+<p><strong>Files:</strong>
+- <code>omnipipe/dcc/nuke/startup.py</code> — startup logic (license check + menu builder)
+- <code>omnipipe/dcc/nuke/menu.py</code> — Nuke bootstrap file
+- <code>scripts/install_nuke_hook.py</code> — installer script</p>
+<h3 id="what-happens-when-nuke-starts">What happens when Nuke starts</h3>
+<pre><code>Nuke boots → scans NUKE_PATH for menu.py → executes it
+  → omnipipe.dcc.nuke.startup.bootstrap() runs:
+      1. Injects repo root + vendor into sys.path
+      2. Validates license (Layer 1 + Layer 2)
+      3. If valid → builds OmniPipe menu bar (5 commands)
+      4. If invalid → menu items show LOCKED + license error
+</code></pre>
+<h3 id="omnipipe-menu-commands">OmniPipe menu commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Shortcut</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Save</strong></td>
+<td><code>Ctrl+S</code></td>
+<td>License-gated <code>nuke.scriptSave()</code></td>
+</tr>
+<tr>
+<td><strong>Save Version Up</strong></td>
+<td><code>Ctrl+Shift+S</code></td>
+<td>Auto <code>_v003</code> → <code>_v004</code> bump &amp; save</td>
+</tr>
+<tr>
+<td><strong>Publish</strong></td>
+<td>—</td>
+<td>Copies to publish path + metadata sidecar</td>
+</tr>
+<tr>
+<td><strong>Load Latest (Read Node)</strong></td>
+<td>—</td>
+<td>Prompts for shot context → creates Read node</td>
+</tr>
+<tr>
+<td><strong>Doctor</strong></td>
+<td>—</td>
+<td>Runs <code>omnipipe doctor</code> in console</td>
+</tr>
+</tbody>
+</table>
+<h3 id="installing-the-hook_1">Installing the hook</h3>
+<pre><code class="language-bash"># Default install
+python3 scripts/install_nuke_hook.py
+
+# Specific Nuke version
+python3 scripts/install_nuke_hook.py --nuke-version 14.0
+
+# Custom plugin directory
+python3 scripts/install_nuke_hook.py --nuke-dir /studio/nuke/plugins
+</code></pre>
+<h3 id="nuke-plugin-directory">Nuke plugin directory</h3>
+<p>All platforms use <code>~/.nuke/</code> by default. The installer writes:
+- <code>menu.py</code> — the OmniPipe bootstrap
+- <code>init.py</code> — sets <code>OMNIPIPE_REPO_ROOT</code> environment variable</p>
               
             </div>
           </div><footer>
