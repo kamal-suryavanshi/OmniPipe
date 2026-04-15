@@ -169,6 +169,20 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#maya-startup-hook">Maya Startup Hook</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#what-happens-when-maya-starts">What happens when Maya starts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#omnipipe-shelf-buttons">OmniPipe shelf buttons</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installing-the-hook">Installing the hook</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#maya-scripts-directory-by-platform">Maya scripts directory by platform</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-the-installer-does">What the installer does</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../license_server/">License Server (Person C)</a>
@@ -271,6 +285,11 @@
 <td><a href="#omnipipe-load-latest"><code>omnipipe load-latest</code></a></td>
 <td>CLI</td>
 <td>Resolve latest published version per shot/task</td>
+</tr>
+<tr>
+<td><a href="#maya-startup-hook"><code>install_maya_hook.py</code></a></td>
+<td>Script</td>
+<td>Installs OmniPipe shelf into Maya</td>
 </tr>
 </tbody>
 </table>
@@ -870,6 +889,88 @@ omnipipe load-latest PROJ sq001 sh0010 comp --dcc nuke
   📦  Latest publish: hero_anim_v008.ma  (v008)
   Full path: /tmp/studio/PROJ/sequences/sq001/sh0010/publish/maya/anim/hero_anim_v008.ma
 </code></pre>
+<hr />
+<h2 id="maya-startup-hook">Maya Startup Hook</h2>
+<p><strong>Files:</strong>
+- <code>omnipipe/dcc/maya/startup.py</code> — startup logic (license check + shelf)
+- <code>omnipipe/dcc/maya/userSetup.py</code> — Maya bootstrap file
+- <code>scripts/install_maya_hook.py</code> — installer script</p>
+<h3 id="what-happens-when-maya-starts">What happens when Maya starts</h3>
+<pre><code>Maya boots → executes userSetup.py
+  → cmds.evalDeferred() waits for full UI load
+  → omnipipe.dcc.maya.startup.bootstrap() runs:
+      1. Injects repo root + vendor into sys.path
+      2. Validates license (Layer 1: local .lic)
+      3. Phone-home heartbeat (Layer 2: server)
+      4. If valid → creates OmniPipe shelf (4 buttons)
+      5. If invalid → shows warning dialog, shelf disabled
+</code></pre>
+<h3 id="omnipipe-shelf-buttons">OmniPipe shelf buttons</h3>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OP Save</strong></td>
+<td>License-gated <code>cmds.file(save=True)</code></td>
+</tr>
+<tr>
+<td><strong>OP Publish</strong></td>
+<td>Runs <code>MayaDCC.publish()</code> → copies to publish path</td>
+</tr>
+<tr>
+<td><strong>OP Load</strong></td>
+<td>Prompts for shot context → references latest publish</td>
+</tr>
+<tr>
+<td><strong>OP Doctor</strong></td>
+<td>Runs <code>omnipipe doctor</code> in Script Editor</td>
+</tr>
+</tbody>
+</table>
+<h3 id="installing-the-hook">Installing the hook</h3>
+<pre><code class="language-bash"># Default: install into Maya 2025
+python3 scripts/install_maya_hook.py
+
+# Specific Maya version
+python3 scripts/install_maya_hook.py --maya-version 2024
+
+# Custom scripts directory
+python3 scripts/install_maya_hook.py --maya-dir /custom/maya/scripts
+</code></pre>
+<h3 id="maya-scripts-directory-by-platform">Maya scripts directory by platform</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS</td>
+<td><code>~/Library/Preferences/Autodesk/maya/{version}/scripts/</code></td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>~/Documents/maya/{version}/scripts/</code></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>~/maya/{version}/scripts/</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-the-installer-does">What the installer does</h3>
+<ol>
+<li>Copies <code>userSetup.py</code> into Maya's scripts directory</li>
+<li>Backs up any existing <code>userSetup.py</code> as <code>.py.bak_omnipipe</code></li>
+<li>Writes <code>OMNIPIPE_REPO_ROOT</code> into <code>Maya.env</code> so startup.py can find the repo</li>
+</ol>
               
             </div>
           </div><footer>
