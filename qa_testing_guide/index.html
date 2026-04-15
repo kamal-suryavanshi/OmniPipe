@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://kamal-suryavanshi.github.io/OmniPipe/qa_testing_guide/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>QA Testing Guide (For Non-Techies) - OmniPipe Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "QA Testing Guide (For Non-Techies)";
+        var mkdocs_page_input_path = "qa_testing_guide.md";
+        var mkdocs_page_url = "/OmniPipe/qa_testing_guide/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OmniPipe Documentation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cheatsheet/">CLI Cheatsheet (Usage)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../test_plan/">Master Test Plan</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">QA Testing Guide (For Non-Techies)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#phase-1-prerequisites">🚀 Phase 1: Prerequisites</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-python-310">1. Python 3.10+</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-a-supported-dcc-creative-app">2. A Supported DCC (Creative App)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-a-studio-drive-or-nas-optional-but-recommended">3. A Studio Drive or NAS (Optional but recommended)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-2-installing-omnipipe">🛠️ Phase 2: Installing OmniPipe</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-3-the-doctor-check">🏥 Phase 3: The Doctor Check</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-4-testing-the-apps-dccs">🎨 Phase 4: Testing the Apps (DCCs)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#test-a-autodesk-maya">Test A: Autodesk Maya</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#test-b-foundry-nuke">Test B: Foundry Nuke</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#phase-5-qa-reporting">📝 Phase 5: QA Reporting</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Studio Setup & Onboarding</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/studio_setup_guide/">▶ Studio Setup Guide (Start Here)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/onboarding/">Onboarding Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/intake_form_reference/">Intake Form Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/pipeline_tools/">Pipeline Tools Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../setup/license_server/">License Server (Person C)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Architecture Walkthroughs</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_1_2/">Task 1 & 2 (Repo & Context)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_3/">Task 3 (Path Manager)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_4/">Task 4 (Publish Design)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_5/">Task 5 (Validators)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_6/">Task 6 (Extractors)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_7/">Task 7 (Metadata)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_8/">Task 8 (Dependency Tracking)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_9/">Task 9 (License System)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../walkthroughs/task_10/">Task 10 (Error Handling)</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OmniPipe Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">QA Testing Guide (For Non-Techies)</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="omnipipe-qa-end-user-testing-guide">OmniPipe QA &amp; End-User Testing Guide</h1>
+<p>Welcome to the OmniPipe testing team! This guide is written for Quality Assurance (QA) testers, Production Coordinators, or Artists who need to test the pipeline <em>before</em> it rolls out to the rest of the studio.</p>
+<p>You don't need to be a programmer or a Technical Director (TD) to follow this guide. We will walk you through exactly what you need, how to install it, and what buttons to click.</p>
+<hr />
+<h2 id="phase-1-prerequisites">🚀 Phase 1: Prerequisites</h2>
+<p>Before you can test OmniPipe, please make sure your computer has the following installed:</p>
+<h3 id="1-python-310">1. Python 3.10+</h3>
+<p>OmniPipe requires modern Python. 
+- <strong>Mac:</strong> Download the <a href="https://www.python.org/downloads/macos/">official macOS installer here</a> or open the Terminal app and type <code>brew install python</code> (if you have Homebrew).
+- <strong>Windows:</strong> Download the <a href="https://www.python.org/downloads/windows/">official Windows installer here</a>. <em>Important: During install, make sure you check the box that says "Add Python to PATH" before hitting Install.</em></p>
+<p><em>To check if you already have it:</em>
+Open your Terminal (Mac) or Command Prompt (Windows) and type:<br />
+<code>python --version</code> (or <code>python3 --version</code>). 
+If it says <code>3.10</code> or higher, you are ready!</p>
+<h3 id="2-a-supported-dcc-creative-app">2. A Supported DCC (Creative App)</h3>
+<p>You must have at least one of these installed on your machine:
+- <strong>Maya</strong> (2022 to 2025)
+- <strong>Nuke</strong> (13.0 to 15.0)
+- <strong>Silhouette</strong></p>
+<h3 id="3-a-studio-drive-or-nas-optional-but-recommended">3. A Studio Drive or NAS (Optional but recommended)</h3>
+<p>OmniPipe relies on a "Studio Root" folder (like a NAS drive at <code>Z:\Projects</code> or <code>/mnt/projects</code>). If you don't have a NAS mounted, OmniPipe will safely use a temporary folder on your local drive (<code>/tmp/studio/</code> on Mac/Linux, or <code>C:\tmp\studio\</code> on Windows).</p>
+<hr />
+<h2 id="phase-2-installing-omnipipe">🛠️ Phase 2: Installing OmniPipe</h2>
+<p>As an artist or tester, you don't have to worry about complex code. Simply run the automated workstation installer!</p>
+<ol>
+<li>Open your <strong>Terminal</strong> or <strong>Command Prompt</strong>.</li>
+<li>Navigate to the folder where you saved the <code>StudioPipeline</code> code. For example:
+   <code>bash
+   cd ~/Developer/StudioPipeline</code></li>
+<li>Run the workstation installer:
+   ```bash
+   # On Mac / Linux:
+   python3 scripts/install_workstation.py</li>
+</ol>
+<p># On Windows:
+   python scripts\install_workstation.py
+   <code>``
+4. **Read the Output:** The screen will show you a checklist of green ✅ checkmarks. It will automatically check your Python version, install any required packages, and try to find a valid license key. 
+   *(Note: If it complains about a missing license, ask your TD for the</code>omnipipe.lic` file and place it in your User Home folder).*</p>
+<hr />
+<h2 id="phase-3-the-doctor-check">🏥 Phase 3: The Doctor Check</h2>
+<p>Now let's make sure your computer is 100% healthy before testing the creative apps. We've built an automated "Doctor" that double-checks your environment.</p>
+<ol>
+<li>In your Terminal, type:
+   ```bash
+   # Mac / Linux
+   ./omnipipe.sh doctor</li>
+</ol>
+<p># Windows
+   omnipipe.bat doctor
+   <code>``
+2. You should see a beautiful visual table appear. Ensure that every item in the</code>Status` column has a green ✅. If you see a red ❌, stop here and report the error message to your TD!</p>
+<hr />
+<h2 id="phase-4-testing-the-apps-dccs">🎨 Phase 4: Testing the Apps (DCCs)</h2>
+<p>Now for the fun part: testing inside the actual software! </p>
+<h3 id="test-a-autodesk-maya">Test A: Autodesk Maya</h3>
+<ol>
+<li>First, we need to inject OmniPipe into Maya. Run the Maya hook installer on your terminal:
+   ```bash
+   # Mac/Linux
+   python3 scripts/install_maya_hook.py</li>
+</ol>
+<p># Windows
+   python scripts\install_maya_hook.py
+   ```
+2. <strong>Open Maya.</strong>
+3. Look at your toolbars near the top. You should see a brand new shelf tab called <strong>OmniPipe</strong>.
+4. Create a simple sphere in the scene.
+5. Click the <strong>OP Save</strong> button on the shelf. Because this is the first save, Maya will ask you where to put it. <em>Manually</em> save it on your computer somewhere. 
+6. Move the sphere slightly.
+7. Click the <strong>OP Publish</strong> button. 
+   - <em>What you should see:</em> A pop-up confirming that your file was automatically named, placed into the correct Pipeline Publish folder, and versioned up without you doing anything!</p>
+<h3 id="test-b-foundry-nuke">Test B: Foundry Nuke</h3>
+<ol>
+<li>Open your Terminal and install the Nuke hook:
+   ```bash
+   # Mac/Linux
+   python3 scripts/install_nuke_hook.py</li>
+</ol>
+<p># Windows
+   python scripts\install_nuke_hook.py
+   <code>``
+2. **Open Nuke.**
+3. At the very top menu bar of Nuke, look for a new menu called **OmniPipe**.
+4. Add a</code>Constant<code>node and a</code>ColorBars<code>node.
+5. Click **OmniPipe &gt; Save Version Up** (or use</code>Ctrl+Shift+S<code>).
+   - *What you should see:* The script will save itself, automatically bumping its version (e.g. from</code>_v001.nk<code>to</code>_v002.nk`).
+6. Click <strong>OmniPipe &gt; Publish</strong>.
+   - <em>What you should see:</em> It will take a snapshot and push it to the central server publish directory safely!</p>
+<hr />
+<h2 id="phase-5-qa-reporting">📝 Phase 5: QA Reporting</h2>
+<p>If you successfully completed all 4 phases, the pipeline is ready for production. </p>
+<p><strong>What to report if something breaks:</strong>
+We have built a custom "black-box" flight recorder. If an app crashes or a button doesn't work, you don't need to describe exactly what happened. 
+Simply open this folder on your computer:
+- <code>~/omnipipe/logs/</code></p>
+<p>Grab the text files inside that folder (which contain the timestamp of your crash) and Slack/email them to your Technical Director. They contain all the hidden data we need to fix the bug!</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../test_plan/" class="btn btn-neutral float-left" title="Master Test Plan"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../setup/studio_setup_guide/" class="btn btn-neutral float-right" title="▶ Studio Setup Guide (Start Here)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../test_plan/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../setup/studio_setup_guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
