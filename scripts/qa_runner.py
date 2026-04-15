@@ -429,6 +429,42 @@ def test_b6_b7_nuke_dcc_methods():
 
 run_test("B6+B7", "NukeDCC.save_version_up + load_latest_as_read exist, dev-mode safe", test_b6_b7_nuke_dcc_methods)
 
+
+# -----------------------------------------------------------------------
+# B8: SILHOUETTE INTEGRATION — startup + save/publish + export shapes
+# -----------------------------------------------------------------------
+def test_b8_silhouette_startup_importable():
+    """Verify the Silhouette startup module can be imported outside Silhouette."""
+    from omnipipe.dcc.silhouette import startup
+    assert hasattr(startup, "bootstrap"), "Missing bootstrap()"
+    assert hasattr(startup, "_validate_license"), "Missing _validate_license()"
+    assert hasattr(startup, "_register_actions"), "Missing _register_actions()"
+
+run_test("B8", "Silhouette startup module importable with bootstrap/_register_actions", test_b8_silhouette_startup_importable)
+
+
+def test_b8_silhouette_dcc_api():
+    """Verify SilhouetteDCC has all required methods + export_shapes."""
+    from omnipipe.dcc.silhouette.api import SilhouetteDCC
+    dcc = SilhouetteDCC()
+    assert hasattr(dcc, "save_version_up"), "Missing save_version_up()"
+    assert hasattr(dcc, "is_project_modified"), "Missing is_project_modified()"
+    assert hasattr(dcc, "export_shapes"), "Missing export_shapes()"
+    # Dev mode: version_up returns empty
+    assert dcc.save_version_up() == ""
+
+run_test("B8", "SilhouetteDCC API: save_version_up + export_shapes exist, dev-mode safe", test_b8_silhouette_dcc_api)
+
+
+def test_b8_dcc_factory_silhouette():
+    """Verify DCC factory returns SilhouetteDCC for 'silhouette'."""
+    from omnipipe.dcc import get_dcc
+    dcc = get_dcc("silhouette")
+    assert dcc is not None, "get_dcc('silhouette') returned None"
+    assert type(dcc).__name__ == "SilhouetteDCC"
+
+run_test("B8", "DCC factory get_dcc('silhouette') returns SilhouetteDCC instance", test_b8_dcc_factory_silhouette)
+
 # -----------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------

@@ -15,5 +15,9 @@ def get_dcc(dcc_name: str) -> Optional[BaseDCC]:
     elif cmd == "nuke":
         from omnipipe.dcc.nuke.api import NukeDCC
         return NukeDCC()
-        
+
+    elif cmd == "silhouette":
+        from omnipipe.dcc.silhouette.api import SilhouetteDCC
+        return SilhouetteDCC()
+
     return None
