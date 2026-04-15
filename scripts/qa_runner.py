@@ -465,6 +465,22 @@ def test_b8_dcc_factory_silhouette():
 
 run_test("B8", "DCC factory get_dcc('silhouette') returns SilhouetteDCC instance", test_b8_dcc_factory_silhouette)
 
+
+# -----------------------------------------------------------------------
+# B9: KITSU INTEGRATION — get_sequence, get_shot, get_task read stubs
+# -----------------------------------------------------------------------
+def test_b9_kitsu_adapter_read_stubs():
+    """Verify KitsuAdapter has the required read stubs."""
+    from omnipipe.services.kitsu_adapter import KitsuAdapter
+    kitsu = KitsuAdapter()
+    assert hasattr(kitsu, "get_project"), "Missing get_project()"
+    assert hasattr(kitsu, "get_sequence"), "Missing get_sequence()"
+    assert hasattr(kitsu, "get_shot"), "Missing get_shot()"
+    assert hasattr(kitsu, "get_task"), "Missing get_task()"
+    assert hasattr(kitsu, "my_tasks"), "Missing my_tasks()"
+
+run_test("B9", "KitsuAdapter read stubs exist for pipeline tracking", test_b9_kitsu_adapter_read_stubs)
+
 # -----------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------
