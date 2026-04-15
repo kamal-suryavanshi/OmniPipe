@@ -100,3 +100,37 @@ INFO    -  Building documentation...
 INFO    -  Documentation built in 0.09 seconds
 INFO    -  [23:34:23] Reloading browsers
 WARNING -  [23:34:23] "GET /OmniPipe/setup/pipeline_tools/ HTTP/1.1" code 404
+WARNING -  [23:34:47] "GET /OmniPipe/setup/pipeline_tools/ HTTP/1.1" code 404
+INFO    -  [23:34:48] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/td_guide/
+INFO    -  [23:34:49] Browser connected: http://127.0.0.1:8000/OmniPipe/
+INFO    -  [23:34:52] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/td_guide/
+INFO    -  [23:34:57] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/testing_guide/
+INFO    -  [23:34:58] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/td_guide/
+INFO    -  [23:35:11] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/developer_guide/
+INFO    -  [23:35:32] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/artist_guide/
+INFO    -  [23:35:42] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/td_guide/
+INFO    -  [23:35:47] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/testing_guide/
+INFO    -  [23:36:59] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/developer_guide/
+INFO    -  [23:37:00] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/artist_guide/
+INFO    -  [23:37:02] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/developer_guide/
+INFO    -  [23:37:09] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/testing_guide/
+INFO    -  [23:37:09] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/td_guide/
+INFO    -  [23:37:44] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/testing_guide/
+INFO    -  [23:38:20] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/td_guide/
+INFO    -  [23:38:50] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/testing_guide/
+INFO    -  [23:38:52] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/developer_guide/
+INFO    -  [23:39:49] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/artist_guide/
+INFO    -  [23:40:43] Detected file changes
+INFO    -  Building documentation...
+INFO    -  Documentation built in 0.10 seconds
+INFO    -  [23:40:44] Reloading browsers
+INFO    -  [23:40:44] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/artist_guide/
+INFO    -  [23:41:02] Detected file changes
+INFO    -  Building documentation...
+INFO    -  [23:41:03] Reloading browsers
+INFO    -  [23:41:03] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/artist_guide/
+INFO    -  [23:41:21] Detected file changes
+INFO    -  Building documentation...
+INFO    -  Documentation built in 0.11 seconds
+INFO    -  [23:41:21] Reloading browsers
+INFO    -  [23:41:21] Browser connected: http://127.0.0.1:8000/OmniPipe/guides/artist_guide/
