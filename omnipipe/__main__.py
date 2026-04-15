@@ -280,5 +280,186 @@ def doctor(
         raise typer.Exit(1)
 
 
+# -----------------------------------------------------------------------
+# B1: PUBLISH — Trigger PublishEngine from CLI
+# -----------------------------------------------------------------------
+@app.command("publish")
+def publish(
+    source: str = typer.Argument(..., help="Path to the source file to publish"),
+    project: str = typer.Option(..., "--project", "-p", help="Project code"),
+    sequence: str = typer.Option(..., "--sequence", "-sq", help="Sequence name"),
+    shot: str = typer.Option(..., "--shot", "-sh", help="Shot name"),
+    task: str = typer.Option(..., "--task", "-t", help="Task name (e.g. anim, comp)"),
+    dcc: str = typer.Option("maya", "--dcc", "-d", help="DCC name (maya, nuke, silhouette)"),
+    version: str = typer.Option(None, "--version", "-v", help="Version string (auto-detected if omitted)"),
+    enable_tracking: bool = typer.Option(False, "--track-deps", help="Enable upstream dependency scanning"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate only — do not copy or write metadata"),
+):
+    """
+    Publish a file through the full OmniPipe pipeline.
+
+    Runs: License check → Validators → Extractors → Dependency Tracking → Metadata JSON.
+
+    Example:
+      omnipipe publish /mnt/nas/projects/PROJ/work/maya/anim/hero_v003.ma \\
+        --project PROJ --sequence sq001 --shot sh0010 --task anim --dcc maya
+    """
+    import os
+    from pathlib import Path as P
+
+    # ── Validate source file exists ───────────────────────────────────────
+    if not os.path.isfile(source):
+        typer.secho(f"\n  ❌  Source file not found: {source}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    # ── License check (Layer 1) ───────────────────────────────────────────
+    from omnipipe.core.license import validate_license
+    is_valid, lic_msg = validate_license()
+    if not is_valid:
+        typer.secho(f"\n  ❌  {lic_msg}", fg=typer.colors.RED)
+        typer.secho("     Publishing requires a valid license.", fg=typer.colors.YELLOW)
+        raise typer.Exit(1)
+
+    typer.secho(f"  ✅  {lic_msg}", fg=typer.colors.GREEN)
+
+    # ── Build context ─────────────────────────────────────────────────────
+    from omnipipe.core.context import PipelineContext, PathResolver
+    from omnipipe.core.versioning import get_latest_version, format_version
+
+    # Auto-detect version from filename if not explicitly provided
+    if not version:
+        from omnipipe.core.versioning import parse_version
+        filename = os.path.basename(source)
+        v = parse_version(filename)
+        version = format_version(v) if v else "v001"
+        typer.echo(f"  Auto-detected version: {version}")
+
+    ctx = PipelineContext(
+        project=project, sequence=sequence, shot=shot,
+        task=task, version=version.lstrip("v"), dcc=dcc,
+    )
+
+    # ── Resolve publish path from schema ──────────────────────────────────
+    try:
+        resolver = PathResolver()
+        publish_path = resolver.resolve(f"publish_file_{dcc}", ctx)
+    except Exception as e:
+        typer.secho(f"\n  ❌  Could not resolve publish path: {e}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    typer.echo(f"  Source:  {source}")
+    typer.echo(f"  Target:  {publish_path}")
+
+    if dry_run:
+        typer.secho(f"\n  [DRY RUN] Validation passed. No files were written.\n", fg=typer.colors.YELLOW)
+        raise typer.Exit(0)
+
+    # ── Run PublishEngine ─────────────────────────────────────────────────
+    from omnipipe.core.publish import PublishEngine, PublishInstance
+
+    inst = PublishInstance(
+        name=os.path.splitext(os.path.basename(source))[0],
+        context=ctx,
+        source_path=source,
+        publish_path=publish_path,
+    )
+
+    engine = PublishEngine(enable_tracking=enable_tracking)
+    engine.add_instance(inst)
+
+    typer.echo("\n  Running PublishEngine…")
+    success = engine.run()
+
+    if success:
+        typer.secho(f"\n  🎉  Published successfully → {publish_path}\n", fg=typer.colors.GREEN)
+    else:
+        typer.secho(f"\n  ❌  Publish FAILED — check logs for details.\n", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+
+# -----------------------------------------------------------------------
+# B2: LOAD-LATEST — Resolve the latest published version of a shot/task
+# -----------------------------------------------------------------------
+@app.command("load-latest")
+def load_latest(
+    project: str = typer.Argument(..., help="Project code"),
+    sequence: str = typer.Argument(..., help="Sequence name (e.g. sq001)"),
+    shot: str = typer.Argument(..., help="Shot name (e.g. sh0010)"),
+    task: str = typer.Argument(..., help="Task name (e.g. anim, comp, fx)"),
+    dcc: str = typer.Option("maya", "--dcc", "-d", help="DCC name (maya, nuke, silhouette)"),
+):
+    """
+    Find and print the latest published file for a given shot/task/DCC.
+
+    Scans the publish directory resolved from schema.yaml, finds the highest
+    versioned file, and prints the full path. Useful for loaders and references.
+
+    Example:
+      omnipipe load-latest PROJ sq001 sh0010 anim --dcc maya
+    """
+    import os, glob
+    from pathlib import Path as P
+    from omnipipe.core.context import PipelineContext, PathResolver
+    from omnipipe.core.versioning import get_latest_version, format_version
+
+    # ── Resolve the publish directory from schema ─────────────────────────
+    ctx = PipelineContext(
+        project=project, sequence=sequence, shot=shot,
+        task=task, version="001", dcc=dcc,
+    )
+
+    try:
+        resolver = PathResolver()
+        # Resolve a versioned publish path, then strip to get directory
+        sample_path = resolver.resolve(f"publish_file_{dcc}", ctx)
+        publish_dir = str(P(sample_path).parent)
+    except Exception as e:
+        typer.secho(f"\n  ❌  Could not resolve publish directory: {e}", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    typer.echo(f"  Publish dir: {publish_dir}")
+
+    # ── Check directory exists ────────────────────────────────────────────
+    if not os.path.isdir(publish_dir):
+        typer.secho(f"  ⚠️   Directory does not exist yet — no publishes found.", fg=typer.colors.YELLOW)
+        typer.echo(f"  (Expected at: {publish_dir})\n")
+        raise typer.Exit(1)
+
+    # ── Scan for latest versioned file ────────────────────────────────────
+    # DCC extension map
+    EXT_MAP = {
+        "maya": ".ma", "nuke": ".nk", "houdini": ".hip",
+        "blender": ".blend", "silhouette": ".sfx",
+    }
+    ext = EXT_MAP.get(dcc.lower(), ".*")
+
+    files = sorted([
+        f for f in os.listdir(publish_dir)
+        if f.endswith(ext) or ext == ".*"
+    ])
+
+    if not files:
+        typer.secho(f"  ⚠️   No published files found in: {publish_dir}", fg=typer.colors.YELLOW)
+        raise typer.Exit(1)
+
+    # Find highest version among the files
+    from omnipipe.core.versioning import parse_version
+    best_file = None
+    best_ver  = 0
+    for f in files:
+        v = parse_version(f)
+        if v and v > best_ver:
+            best_ver  = v
+            best_file = f
+
+    if not best_file:
+        typer.secho(f"  ⚠️   Files found but none match version pattern (_vNNN): {files}", fg=typer.colors.YELLOW)
+        raise typer.Exit(1)
+
+    latest_path = os.path.join(publish_dir, best_file)
+    typer.secho(f"\n  📦  Latest publish: {best_file}  (v{best_ver:03d})", fg=typer.colors.CYAN, bold=True)
+    typer.echo(f"  Full path: {latest_path}\n")
+
+
 if __name__ == "__main__":
     app()

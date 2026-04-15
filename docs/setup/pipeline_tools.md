@@ -1,6 +1,6 @@
 # Pipeline Tools Reference
 
-This section documents all six production-gap tools added to OmniPipe after the core 10-task roadmap. Each tool addresses a real-world deployment scenario.
+This section documents all production-ready tools in OmniPipe. Each tool addresses a real-world deployment or artist workflow scenario.
 
 ---
 
@@ -14,6 +14,8 @@ This section documents all six production-gap tools added to OmniPipe after the 
 | [NAS permission check](#gap-4-nas-permission-validation) | Built-in | Fail fast if NAS not writable before init |
 | [`omnipipe doctor`](#gap-5-omnipipe-doctor) | CLI | Full environment health check |
 | [`omnipipe.sh` / `omnipipe.bat`](#gap-6-os-launchers) | Launcher | Double-click or alias CLI entry point |
+| [`omnipipe publish`](#omnipipe-publish) | CLI | Publish files through full pipeline lifecycle |
+| [`omnipipe load-latest`](#omnipipe-load-latest) | CLI | Resolve latest published version per shot/task |
 
 ---
 
@@ -326,4 +328,121 @@ Both launchers display a command reference menu when run with no args:
 ```bash
 ./omnipipe.sh
 # → shows all available commands + admin script references
+```
+
+---
+
+## `omnipipe publish`
+
+**Command:** `omnipipe publish`
+
+Publishes a source file through the complete pipeline lifecycle: **License → Validators → Extractors → Dependency Tracking → Metadata JSON**.
+
+### Usage
+
+```bash
+omnipipe publish SOURCE [OPTIONS]
+```
+
+### Arguments
+
+| Argument | Description | Example |
+|---|---|---|
+| `SOURCE` | Path to the source file to publish | `/mnt/nas/PROJ/work/maya/anim/hero_v003.ma` |
+
+### Options
+
+| Option | Short | Default | Description |
+|---|---|---|---|
+| `--project` | `-p` | *required* | Project code |
+| `--sequence` | `-sq` | *required* | Sequence name |
+| `--shot` | `-sh` | *required* | Shot name |
+| `--task` | `-t` | *required* | Task name |
+| `--dcc` | `-d` | `maya` | DCC name (`maya`, `nuke`, `silhouette`) |
+| `--version` | `-v` | *auto-detected* | Version string (reads from filename if omitted) |
+| `--track-deps` | | `False` | Enable upstream dependency scanning |
+| `--dry-run` | | `False` | Validate only — no files written |
+
+### Examples
+
+```bash
+# Publish with dependency tracking
+omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+  --project PROJ --sequence sq001 --shot sh0010 --task anim --track-deps
+
+# Dry-run: validates everything but writes nothing
+omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+  --project PROJ --sequence sq001 --shot sh0010 --task anim --dry-run
+
+# Override auto-detected version
+omnipipe publish ./char_rig.ma \
+  -p PROJ -sq sq001 -sh sh0010 -t rig --version v005
+```
+
+### Pipeline Phases
+
+| Phase | What happens |
+|---|---|
+| License | Validates `~/omnipipe.lic` (blocks whole pipeline if invalid) |
+| Validators | FileExists, NamingConvention checks |
+| Extractors | EXR sequence, Playblast generation |
+| Dependencies | Scans Maya/Nuke ASCII for `file -r` references (if `--track-deps`) |
+| Metadata | Writes `{name}.json` sidecar with user, timestamp, source path, dependencies |
+
+---
+
+## `omnipipe load-latest`
+
+**Command:** `omnipipe load-latest`
+
+Scans the publish directory for a given shot/task/DCC and returns the path to the **highest versioned** file. Used by Nuke/Maya loaders to resolve references.
+
+### Usage
+
+```bash
+omnipipe load-latest PROJECT SEQUENCE SHOT TASK [OPTIONS]
+```
+
+### Arguments
+
+| Argument | Description | Example |
+|---|---|---|
+| `PROJECT` | Project code | `ACME_PROJ` |
+| `SEQUENCE` | Sequence name | `sq001` |
+| `SHOT` | Shot name | `sh0010` |
+| `TASK` | Task name | `anim` |
+
+### Options
+
+| Option | Short | Default | Description |
+|---|---|---|---|
+| `--dcc` | `-d` | `maya` | DCC to filter by (determines file extension) |
+
+### DCC Extension Map
+
+| DCC | Extension scanned |
+|---|---|
+| `maya` | `.ma` |
+| `nuke` | `.nk` |
+| `houdini` | `.hip` |
+| `blender` | `.blend` |
+| `silhouette` | `.sfx` |
+
+### Examples
+
+```bash
+# Latest Maya animation publish
+omnipipe load-latest PROJ sq001 sh0010 anim --dcc maya
+
+# Latest Nuke comp publish
+omnipipe load-latest PROJ sq001 sh0010 comp --dcc nuke
+```
+
+### Expected Output
+
+```
+  Publish dir: /tmp/studio/PROJ/sequences/sq001/sh0010/publish/maya/anim
+
+  📦  Latest publish: hero_anim_v008.ma  (v008)
+  Full path: /tmp/studio/PROJ/sequences/sq001/sh0010/publish/maya/anim/hero_anim_v008.ma
 ```

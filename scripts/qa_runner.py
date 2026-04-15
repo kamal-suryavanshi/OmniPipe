@@ -321,6 +321,50 @@ run_test(
     test_grace_period_expired_blocks,
 )
 
+
+# -----------------------------------------------------------------------
+# B1: PUBLISH CLI — version auto-detection
+# -----------------------------------------------------------------------
+def test_b1_publish_version_autodetect():
+    """
+    Verify parse_version() correctly reads version from filenames,
+    used by the publish command to auto-detect version.
+    """
+    from omnipipe.core.versioning import parse_version, format_version
+    assert parse_version("hero_anim_v003.ma") == 3
+    assert parse_version("char_rig_v012.ma") == 12
+    assert parse_version("no_version.ma") is None
+    assert format_version(3) == "v003"
+    assert format_version(12) == "v012"
+
+run_test("B1", "Publish CLI version auto-detection (parse_version + format_version)", test_b1_publish_version_autodetect)
+
+
+# -----------------------------------------------------------------------
+# B2: LOAD-LATEST — version scanning picks highest
+# -----------------------------------------------------------------------
+def test_b2_load_latest_picks_highest():
+    """
+    Simulate a publish directory with several versioned files and verify
+    get_latest_version returns the correct highest version.
+    """
+    import shutil
+    tmp_dir = "/tmp/omnipipe_qa_loadlatest"
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+    os.makedirs(tmp_dir)
+
+    # Create scattered versions
+    for v in ["v001", "v002", "v005", "v003"]:
+        open(os.path.join(tmp_dir, f"hero_anim_{v}.ma"), "w").close()
+
+    from omnipipe.core.versioning import get_latest_version
+    latest = get_latest_version(tmp_dir, "hero_anim", ".ma")
+    assert latest == 5, f"Expected latest version 5, got {latest}"
+
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+
+run_test("B2", "load-latest: get_latest_version picks v005 from [v001,v002,v003,v005]", test_b2_load_latest_picks_highest)
+
 # -----------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------

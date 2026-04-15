@@ -46,5 +46,54 @@ python -m omnipipe [COMMAND] [OPTIONS]
   ```
   *(Expected Output: Simulated secure save and publish dummy terminal outputs)*
 
+### 5. `publish`
+- **Who:** Artists, TDs
+- **Description:** Publishes a source file through the full OmniPipe pipeline — validates license, runs validators & extractors, tracks dependencies, writes metadata JSON.
+- **Valid Examples:**
+  ```bash
+  # Publish a Maya animation file with full tracking
+  python -m omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+    --project PROJ --sequence sq001 --shot sh0010 --task anim --dcc maya --track-deps
+
+  # Dry-run (validate only, no files written)
+  python -m omnipipe publish /mnt/nas/PROJ/work/maya/anim/hero_v003.ma \
+    --project PROJ --sequence sq001 --shot sh0010 --task anim --dry-run
+
+  # Explicit version override
+  python -m omnipipe publish ./char_rig.ma \
+    --project PROJ -sq sq001 -sh sh0010 -t rig --version v005
+  ```
+  *(Auto-detects version from filename if `--version` is omitted)*
+
+### 6. `load-latest`
+- **Who:** Artists, TDs, DCC Loaders
+- **Description:** Scans the publish directory for a given shot/task/DCC and prints the path to the latest versioned file. Used by Nuke/Maya loaders to resolve references.
+- **Valid Examples:**
+  ```bash
+  # Find latest Maya anim publish
+  python -m omnipipe load-latest PROJ sq001 sh0010 anim --dcc maya
+
+  # Find latest Nuke comp publish
+  python -m omnipipe load-latest PROJ sq001 sh0010 comp --dcc nuke
+  ```
+  *(Prints: `📦 Latest publish: hero_anim_v008.ma (v008)` + full path)*
+
+### 7. `create-shot`
+- **Who:** Production Coordinators, TDs
+- **Description:** Creates a new shot's full folder tree (work/publish/render/cache) without re-running init_studio.
+- **Valid Example:**
+  ```bash
+  python -m omnipipe create-shot /mnt/nas PROJ sq003 sh0050
+  python -m omnipipe create-shot /mnt/nas PROJ sq003 sh0050 --dry-run  # preview only
+  ```
+
+### 8. `doctor`
+- **Who:** TDs, System Admins
+- **Description:** Runs a full post-deploy health check — Python version, imports, license, NAS mount, schema, studio stamp.
+- **Valid Example:**
+  ```bash
+  python -m omnipipe doctor --studio-root /mnt/nas --project PROJ
+  ```
+
 ---
-_Note: More features (Publishing, Workfile Manager) will be added here as Day 5+ progresses!_
+_See `docs/setup/pipeline_tools.md` for the complete reference with all flags._
