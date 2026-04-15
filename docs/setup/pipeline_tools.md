@@ -582,3 +582,38 @@ Silhouette boots → invokes predefined scripts or user runs it
 | **Save Version Up** | Auto `_v003` → `_v004` bump & save |
 | **Publish** | Copies to publish path + metadata sidecar |
 | **Export Shapes (Nuke)** | Exports Silhouette shapes to Nuke `.nk` format |
+
+---
+
+## `omnipipe login` (Kitsu Integration)
+
+**Command:** `omnipipe login`
+
+OmniPipe interfaces with [Kitsu](https://cgwire.com/kitsu) (Zou backend) for production tracking and asset management. 
+
+### Usage
+
+```bash
+omnipipe login
+```
+
+### Authentication Configuration
+
+OmniPipe uses the `KitsuAdapter` module to connect. Store your credentials in your `.env` file at the root of your pipeline:
+
+```bash
+KITSU_HOST="http://localhost/api"
+KITSU_LOGIN="admin@example.com"
+KITSU_PWD="your_secure_password"
+```
+
+*Note: In a true production environment, `KITSU_PWD` should be an application API token, not a user password.*
+
+### What OmniPipe can read
+
+The `KitsuAdapter` currently provides these read operations for context resolution and validation:
+- `get_project(project_name)`
+- `get_sequence(project, sequence_name)`
+- `get_shot(sequence, shot_name)`
+- `get_task(shot, task_type_name)`
+- `my_tasks()` — Fetches a list of tasks assigned to the currently authenticated pipeline user.
